@@ -1,0 +1,16 @@
+{
+
+  "manifest_version": 2,
+  "name": "Context Browser",
+  "version": "1.0",
+
+  "description": "Improves browsing experience with CONTEXT.",
+
+  "content_scripts": [
+    {
+	  "matches": ["<all_urls>"],
+      "js": ["helloworld.js"]
+    }
+  ]
+
+}
