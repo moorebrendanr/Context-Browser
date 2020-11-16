@@ -1,4 +1,4 @@
-#linkPreview {
+#linkPreviewContainer {
     position: fixed;
     display: block;
     width: 50%;
@@ -6,4 +6,8 @@
     top: 0;
     left: 0;
     z-index: 1000000;
+}
+#linkPreviewIframe {
+    width: 100%;
+    height: 100%;
 }
