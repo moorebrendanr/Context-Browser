@@ -13,10 +13,13 @@ function onReceived(message) {
 }
 
 function notifyLinkClicked(e) {
-    if (e.target.tagName === "A") {
+    var el = e.target;
+    while (el.tagName !== "A" && el !== el.parentNode)
+        el = el.parentNode;
+    if (el.tagName === "A") {
         browser.runtime.sendMessage({
             "id": 1,
-            "url": e.target.href
+            "url": el.href
         });
     }
 }
