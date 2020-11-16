@@ -21,11 +21,19 @@ function notifyLinkClicked(e) {
     while (el.tagName !== "A" && el !== el.parentNode)
         el = el.parentNode;
     if (el.tagName === "A") {
-        browser.runtime.sendMessage({
-            "id": 1,
-            "url": el.href
+        browser.storage.local.get('enabled').then(function (data) {
+            if (data['enabled'])
+                handleLinkClick(el)
         });
     }
+}
+
+function handleLinkClick(el) {
+    console.log('asdf');
+    browser.runtime.sendMessage({
+        "id": 1,
+        "url": el.href
+    });
 }
 
 function setResizable() {

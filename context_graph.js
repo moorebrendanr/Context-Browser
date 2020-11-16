@@ -1,3 +1,14 @@
+const edb = $('#enableDisableButton');
+
+// set initial state of enable/disable button based on whether currently enabled
+browser.storage.local.get('enabled').then(
+	e => edb.text(e['enabled'] ? 'Disable' : 'Enable'));
+
+edb.click(function() {
+	if (edb.text() == 'Enable') edb.text('Disable'); else edb.text('Enable');
+	browser.runtime.sendMessage({ 'id': 'enableDisable' });
+});
+
 function onGot(tabs) {
 	console.log(tabs);
 	if (tabs.length > 0) {

@@ -1,5 +1,9 @@
 browser.runtime.onMessage.addListener(onReceived);
 
+var enabled = true;
+
+browser.storage.local.set({ 'enabled': enabled });
+
 const pattern = "<all_urls>";
 let lastClickedLink = null;
 
@@ -7,6 +11,9 @@ function onReceived(message) {
     if (message.id === 1) {
         console.log(`Clicked link: ${message.url}`);
         lastClickedLink = message.url;
+    } else if (message.id == 'enableDisable') {
+        enabled = !enabled;
+        browser.storage.local.set({ 'enabled': enabled });
     }
 }
 
