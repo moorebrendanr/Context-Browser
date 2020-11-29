@@ -11,6 +11,12 @@ function onReceived(message) {
         iframe.src = message.url;
         iframe.id = "linkPreviewIframe";
         div.appendChild(iframe);
+        let btn = document.createElement("button");
+        btn.type = "button";
+        btn.id = "iframeCloseBtn";
+        btn.innerHTML = "x";
+        btn.onclick = function() { $("#linkPreviewContainer").remove() }
+        div.appendChild(btn);
         document.body.appendChild(div);
         setResizable();
     }
@@ -29,7 +35,7 @@ function notifyLinkClicked(e) {
 }
 
 function handleLinkClick(el) {
-    console.log('asdf');
+    console.log('Link clicked');
     browser.runtime.sendMessage({
         "id": 1,
         "url": el.href

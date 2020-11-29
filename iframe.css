@@ -16,3 +16,9 @@
     border: none;
     frameBorder: none;
 }
+
+#iframeCloseBtn {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+}
