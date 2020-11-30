@@ -82,7 +82,20 @@ function createIframe(url) {
         let btnMax = document.createElement("button");
         btnMax.type = "button";
         btnMax.innerHTML = "+";
-        btnMax.onclick = function() { window.location.href = url; };
+        btnMax.onclick = function() {
+            let currentlyMaximized = (div.clientHeight >= 0.90 * window.innerHeight && div.clientWidth >= 0.90 * window.innerWidth);
+            if (currentlyMaximized) {
+                div.style.width = '50%';
+                div.style.height = '50%';
+                div.style.top = '10px';
+                div.style.left = '10px';
+            } else {
+                div.style.width = '100%';
+                div.style.height = '100%';
+                div.style.top = '0';
+                div.style.left = '0';
+            }
+        };
 
         // put the elements together
         btnContainer.appendChild(btnMin);
