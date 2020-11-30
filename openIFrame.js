@@ -2,8 +2,9 @@ browser.runtime.onMessage.addListener(onReceived);
 
 window.addEventListener("click", notifyLinkClicked);
 
-// Prevent links from opening in new tab
-$("a").attr("target", "_self");
+$("a")
+    .attr("target", "_self") // Prevent links from opening in new tab
+    .removeAttr("onmousedown"); // Prevent google from messing up our plugin
 
 function onReceived(message) {
     if (message.id === 0) {
