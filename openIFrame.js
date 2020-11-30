@@ -6,6 +6,12 @@ $("a")
     .attr("target", "_self") // Prevent links from opening in new tab
     .removeAttr("onmousedown"); // Prevent google from messing up our plugin
 
+// Map each url string to an object consisting of a containerId (the iframe's container) 
+// and a minimizedId (the minimized button for that iframe)
+// {url: {containerId, minimizedId}}
+const iframes = new Map();
+var idModifier = 0;
+
 function onReceived(message) {
     if (message.id === 0) {
         createIframe(message.url);
@@ -13,44 +19,72 @@ function onReceived(message) {
 }
 
 // TODO: Each link should be associated with an iframe with a unique id. Each id can only be open once.
+/**
+* Create a PiP view associated with a certain link element on the page.
+*/
 function createIframe(url) {
     console.log("Creating iframe");
-    if (!document.getElementById("linkPreviewContainer")) {
-        let div = document.createElement("div");
-        div.id = "linkPreviewContainer";
+    if (!iframes.has(url)) {
+        let containerId = "linkPreviewContainer" + idModifier;
 
+        // Create the minimized button
+        let minimized = document.createElement("button");
+        let minimizedId = "minimized" + idModifier;
+        minimized.id = minimizedId;
+        minimized.type = "button";
+        minimized.innerHTML = "+";
+        minimized.style.display = "none";
+        minimized.onclick = function() {
+            this.style.display = "none";
+            div.style.display = "block";
+        };
+        let element = $(`.userClicked${idModifier}`)[0];
+        insertAfter(minimized, element);
+
+        // Create the containing div
+        let div = document.createElement("div");
+        div.id = containerId;
+        div.classList.add("linkPreviewContainer");
+
+        // create the iframe
         let iframe = document.createElement("iframe");
         iframe.src = url;
-        iframe.id = "linkPreviewIframe";
+        iframe.classList.add("linkPreviewIframe");
 
+        // create the header bar
         let headerBar = document.createElement("div");
-        headerBar.id = "headerBar";
+        headerBar.classList.add("headerBar");
 
+        // create the button container
         let btnContainer = document.createElement("div");
-        btnContainer.id = "btnContainer";
+        btnContainer.classList.add("btnContainer");
 
+        // create the close button
         let btnClose = document.createElement("button");
         btnClose.type = "button";
-        btnClose.id = "iframeCloseBtn";
         btnClose.innerHTML = "x";
-        btnClose.onclick = function() { $("#linkPreviewContainer").remove() };
+        btnClose.onclick = function() { 
+            div.remove();
+            iframes.delete(url); 
+        };
 
+        // create the minimize button
         let btnMin = document.createElement("button");
         btnMin.type = "button";
-        btnMin.id = "iframeMinBtn";
         btnMin.innerHTML = "–";
         btnMin.onclick = function() { 
             console.log("minimize clicked");
-            $("#linkPreviewContainer").css("display", "none");
-            $("#minimized").css("display", "inline");
+            div.style.display = "none";
+            minimized.style.display = "inline";
         };
 
+        // create the maximize button
         let btnMax = document.createElement("button");
         btnMax.type = "button";
-        btnMax.id = "iframeMaxBtn";
         btnMax.innerHTML = "+";
         btnMax.onclick = function() { window.location.href = url; };
 
+        // put the elements together
         btnContainer.appendChild(btnMin);
         btnContainer.appendChild(btnMax);
         btnContainer.appendChild(btnClose);
@@ -59,23 +93,13 @@ function createIframe(url) {
         div.appendChild(iframe);
         document.body.appendChild(div);
 
-        Array.from(document.getElementsByClassName("userClicked")).forEach((el, id) => {
-            if (!document.getElementById("minimized")) {
-                let minimized = document.createElement("button");
-                minimized.id = "minimized"; // TODO: need to change this, since IDs need to be unique.
-                minimized.type = "button";
-                minimized.innerHTML = "+";
-                minimized.style.display = "none";
-                minimized.onclick = function() {
-                    this.style.display = "none";
-                    $("#linkPreviewContainer").css("display", "block");
-                }
-                insertAfter(minimized, el);
-            }
-        });
-
-        setResizable();
-        dragElement(document.getElementById("linkPreviewContainer"));
+        // Add the ids to the map
+        let pair = {containerId: containerId, minimizedId: minimizedId};
+        iframes.set(url, pair);
+        
+        dragElement(div);
+        // setResizable(containerId);
+        idModifier++;
     }
 }
 
@@ -93,16 +117,18 @@ function notifyLinkClicked(e) {
 
 function handleLinkClick(el) {
     console.log('Link clicked');
-    el.classList.add("userClicked");
+    // give the element a unique class to find it later
+    el.classList.add("userClicked" + idModifier);
     browser.runtime.sendMessage({
         "id": 1,
         "url": el.href
     });
 }
 
-function setResizable() {
+function setResizable(id) {
+    console.log("set resizable");
     // https://stackoverflow.com/a/22720042
-    $("#linkPreviewContainer").resizable({
+    $("#"+id).resizable({
         start: function(event, ui) {
             ui.element.append($("<div/>", {
                 id: "iframe-barrier",
@@ -128,13 +154,7 @@ function setResizable() {
 // https://www.w3schools.com/howto/howto_js_draggable.asp
 function dragElement(elmnt) {
   var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-  if (document.getElementById("headerBar")) {
-    // if present, the header is where you move the DIV from:
-    document.getElementById("headerBar").onmousedown = dragMouseDown;
-  } else {
-    // otherwise, move the DIV from anywhere inside the DIV:
-    elmnt.onmousedown = dragMouseDown;
-  }
+  elmnt.firstChild.onmousedown = dragMouseDown;
 
   function dragMouseDown(e) {
     console.log("header clicked");
@@ -172,6 +192,3 @@ function dragElement(elmnt) {
 function insertAfter(newNode, referenceNode) {
     referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
 }
-
-setResizable();
-dragElement(document.getElementById("linkPreviewContainer"));

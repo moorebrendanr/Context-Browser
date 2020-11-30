@@ -1,4 +1,4 @@
-#linkPreviewContainer {
+.linkPreviewContainer {
     position: fixed;
     display: block;
     width: 50%;
@@ -10,7 +10,7 @@
     background: white;
 }
 
-#linkPreviewIframe {
+.linkPreviewIframe {
     width: 100%;
     height: calc(100% - 20px);
     margin-top: 20px;
@@ -18,7 +18,7 @@
     frameBorder: none;
 }
 
-#headerBar {
+.headerBar {
     position: absolute;
     top: 0px;
     width: 100%;
@@ -27,20 +27,8 @@
     cursor: move;
 }
 
-#btnContainer {
+.btnContainer {
     position: absolute;
     top: 0px;
     right: 0px;
 }
-
-/*#iframeCloseBtn {
-    position: absolute;
-    top: 0px;
-    right: 0px;
-}
-
-#iframeMinBtn {
-    position: absolute;
-    top: 0px;
-    right: 25px;
-}*/
