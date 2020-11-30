@@ -38,7 +38,7 @@
   ],
 
   "background": {
-    "scripts": ["background.js"]
+    "scripts": ["arboreal.js", "background.js"]
   },
   
   "browser_action": {
