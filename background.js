@@ -7,30 +7,35 @@ browser.storage.local.set({ 'enabled': enabled });
 const pattern = "<all_urls>";
 let lastClickedLink = null;
 
-function onReceived(message) {
-    if (message.id === 1) {
-        console.log(`Clicked link: ${message.url}`);
-        lastClickedLink = message.url;
-    } else if (message.id == 'enableDisable') {
+function onReceived(message, sender, sendResponse) {
+    if (message.id == 'enableDisable') {
         enabled = !enabled;
         browser.storage.local.set({ 'enabled': enabled });
+    } else if (message.id === 'linkClicked') {
+        console.log(`Tab ${sender.tab.id} clicked link from ${message.sourceUrl} to ${message.targetUrl}`);
+        lastClickedLink = message.targetUrl;
+        redirectTab(sender.tab, message.sourceUrl, message.targetUrl, sendResponse);
     }
 }
 
 function redirect(requestDetails) {
-    console.log(`Redirecting url: ${requestDetails.url}`);
+    console.log(`Requested url: ${requestDetails.url}`);
     if (lastClickedLink === requestDetails.url) {
         console.log("Cancelling request.");
         lastClickedLink = null;
-        browser.tabs.query({
-            currentWindow: true,
-            active: true
-        }).then(tabs => sendMessageToTabs(tabs, requestDetails)).catch(onError);
         return {"cancel": true};
     } else {
         return {"cancel": false};
     }
 }
+
+function redirectTab(tab, sourceUrl, targetUrl, sendResponse) {
+    console.log(`Asking tab ${tab.id} to open ${targetUrl}`);
+    browser.tabs.sendMessage(tab.id, {
+        'id': 'openIFrame',
+        'targetUrl': targetUrl
+    });
+};
 
 function onError(error) {
     console.error(`Error: ${error}`);

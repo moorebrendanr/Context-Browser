@@ -13,7 +13,7 @@ const iframes = new Map();
 var idModifier = 0;
 
 function onReceived(message) {
-    if (message.id === 0) {
+    if (message.id === 'openIFrame') {
         createIframe(message.url);
     }
 }
@@ -133,8 +133,9 @@ function handleLinkClick(el) {
     // give the element a unique class to find it later
     el.classList.add("userClicked" + idModifier);
     browser.runtime.sendMessage({
-        "id": 1,
-        "url": el.href
+        "id": 'linkClicked',
+        "sourceUrl": document.location.href,
+        "targetUrl": el.href
     });
 }
 
