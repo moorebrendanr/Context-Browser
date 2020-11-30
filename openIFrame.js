@@ -14,7 +14,7 @@ var idModifier = 0;
 
 function onReceived(message) {
     if (message.id === 'openIFrame') {
-        createIframe(message.url);
+        createIframe(message.targetUrl);
     }
 }
 
@@ -24,96 +24,94 @@ function onReceived(message) {
 */
 function createIframe(url) {
     console.log("Creating iframe");
-    if (!iframes.has(url)) {
-        let containerId = "linkPreviewContainer" + idModifier;
+    let containerId = "linkPreviewContainer" + idModifier;
 
-        // Create the minimized button
-        let minimized = document.createElement("button");
-        let minimizedId = "minimized" + idModifier;
-        minimized.id = minimizedId;
-        minimized.type = "button";
-        minimized.innerHTML = "+";
-        minimized.style.display = "none";
-        minimized.onclick = function() {
-            this.style.display = "none";
-            div.style.display = "block";
-        };
-        let element = $(`.userClicked${idModifier}`)[0];
-        insertAfter(minimized, element);
+    // Create the minimized button
+    let minimized = document.createElement("button");
+    let minimizedId = "minimized" + idModifier;
+    minimized.id = minimizedId;
+    minimized.type = "button";
+    minimized.innerHTML = "+";
+    minimized.style.display = "none";
+    minimized.onclick = function() {
+        this.style.display = "none";
+        div.style.display = "block";
+    };
+    let element = $(`.userClicked${idModifier}`)[0];
+    insertAfter(minimized, element);
 
-        // Create the containing div
-        let div = document.createElement("div");
-        div.id = containerId;
-        div.classList.add("linkPreviewContainer");
+    // Create the containing div
+    let div = document.createElement("div");
+    div.id = containerId;
+    div.classList.add("linkPreviewContainer");
 
-        // create the iframe
-        let iframe = document.createElement("iframe");
-        iframe.src = url;
-        iframe.classList.add("linkPreviewIframe");
+    // create the iframe
+    let iframe = document.createElement("iframe");
+    iframe.src = url;
+    iframe.classList.add("linkPreviewIframe");
 
-        // create the header bar
-        let headerBar = document.createElement("div");
-        headerBar.classList.add("headerBar");
+    // create the header bar
+    let headerBar = document.createElement("div");
+    headerBar.classList.add("headerBar");
 
-        // create the button container
-        let btnContainer = document.createElement("div");
-        btnContainer.classList.add("btnContainer");
+    // create the button container
+    let btnContainer = document.createElement("div");
+    btnContainer.classList.add("btnContainer");
 
-        // create the close button
-        let btnClose = document.createElement("button");
-        btnClose.type = "button";
-        btnClose.innerHTML = "x";
-        btnClose.onclick = function() { 
-            div.remove();
-            iframes.delete(url); 
-        };
+    // create the close button
+    let btnClose = document.createElement("button");
+    btnClose.type = "button";
+    btnClose.innerHTML = "x";
+    btnClose.onclick = function() { 
+        div.remove();
+        iframes.delete(url); 
+    };
 
-        // create the minimize button
-        let btnMin = document.createElement("button");
-        btnMin.type = "button";
-        btnMin.innerHTML = "–";
-        btnMin.onclick = function() { 
-            console.log("minimize clicked");
-            div.style.display = "none";
-            minimized.style.display = "inline";
-        };
+    // create the minimize button
+    let btnMin = document.createElement("button");
+    btnMin.type = "button";
+    btnMin.innerHTML = "–";
+    btnMin.onclick = function() { 
+        console.log("minimize clicked");
+        div.style.display = "none";
+        minimized.style.display = "inline";
+    };
 
-        // create the maximize button
-        let btnMax = document.createElement("button");
-        btnMax.type = "button";
-        btnMax.innerHTML = "+";
-        btnMax.onclick = function() {
-            let currentlyMaximized = (div.clientHeight >= 0.90 * window.innerHeight && div.clientWidth >= 0.90 * window.innerWidth);
-            if (currentlyMaximized) {
-                div.style.width = '50%';
-                div.style.height = '50%';
-                div.style.top = '10px';
-                div.style.left = '10px';
-            } else {
-                div.style.width = '100%';
-                div.style.height = '100%';
-                div.style.top = '0';
-                div.style.left = '0';
-            }
-        };
+    // create the maximize button
+    let btnMax = document.createElement("button");
+    btnMax.type = "button";
+    btnMax.innerHTML = "+";
+    btnMax.onclick = function() {
+        let currentlyMaximized = (div.clientHeight >= 0.90 * window.innerHeight && div.clientWidth >= 0.90 * window.innerWidth);
+        if (currentlyMaximized) {
+            div.style.width = '50%';
+            div.style.height = '50%';
+            div.style.top = '10px';
+            div.style.left = '10px';
+        } else {
+            div.style.width = '100%';
+            div.style.height = '100%';
+            div.style.top = '0';
+            div.style.left = '0';
+        }
+    };
 
-        // put the elements together
-        btnContainer.appendChild(btnMin);
-        btnContainer.appendChild(btnMax);
-        btnContainer.appendChild(btnClose);
-        headerBar.appendChild(btnContainer);
-        div.appendChild(headerBar);
-        div.appendChild(iframe);
-        document.body.appendChild(div);
+    // put the elements together
+    btnContainer.appendChild(btnMin);
+    btnContainer.appendChild(btnMax);
+    btnContainer.appendChild(btnClose);
+    headerBar.appendChild(btnContainer);
+    div.appendChild(headerBar);
+    div.appendChild(iframe);
+    document.body.appendChild(div);
 
-        // Add the ids to the map
-        let pair = {containerId: containerId, minimizedId: minimizedId};
-        iframes.set(url, pair);
-        
-        dragElement(div);
-        // setResizable(containerId);
-        idModifier++;
-    }
+    // Add the ids to the map
+    let pair = {containerId: containerId, minimizedId: minimizedId};
+    iframes.set(url, pair);
+    
+    dragElement(div);
+    // setResizable(containerId);
+    idModifier++;
 }
 
 function notifyLinkClicked(e) {
