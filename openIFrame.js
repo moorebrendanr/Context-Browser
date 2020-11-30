@@ -8,8 +8,10 @@ function onReceived(message) {
     }
 }
 
+// TODO: Each link should be associated with an iframe with a unique id. Each id can only be open once.
 function createIframe(url) {
     console.log("Creating iframe");
+    if (!document.getElementById("linkPreviewContainer")) {
         let div = document.createElement("div");
         div.id = "linkPreviewContainer";
 
@@ -53,20 +55,23 @@ function createIframe(url) {
         document.body.appendChild(div);
 
         Array.from(document.getElementsByClassName("userClicked")).forEach((el, id) => {
-            let minimized = document.createElement("button");
-            minimized.id = "minimized"; // TODO: need to change this, since IDs need to be unique.
-            minimized.type = "button";
-            minimized.innerHTML = "+";
-            minimized.style.display = "none";
-            minimized.onclick = function() {
-                this.style.display = "none";
-                $("#linkPreviewContainer").css("display", "block");
+            if (!document.getElementById("minimized")) {
+                let minimized = document.createElement("button");
+                minimized.id = "minimized"; // TODO: need to change this, since IDs need to be unique.
+                minimized.type = "button";
+                minimized.innerHTML = "+";
+                minimized.style.display = "none";
+                minimized.onclick = function() {
+                    this.style.display = "none";
+                    $("#linkPreviewContainer").css("display", "block");
+                }
+                insertAfter(minimized, el);
             }
-            insertAfter(minimized, el); // TODO: should only insert if not already there.
         });
 
         setResizable();
         dragElement(document.getElementById("linkPreviewContainer"));
+    }
 }
 
 function notifyLinkClicked(e) {
