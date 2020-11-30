@@ -2,6 +2,9 @@ browser.runtime.onMessage.addListener(onReceived);
 
 window.addEventListener("click", notifyLinkClicked);
 
+// Prevent links from opening in new tab
+$("a").attr("target", "_self");
+
 function onReceived(message) {
     if (message.id === 0) {
         createIframe(message.url);
