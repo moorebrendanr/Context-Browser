@@ -9,16 +9,16 @@ edb.click(function() {
 	browser.runtime.sendMessage({ 'id': 'enableDisable' });
 });
 
-function onGot(tabs) {
-	console.log(tabs);
-	if (tabs.length > 0) {
-		document.getElementById("site").innerHTML = tabs[0].url;
-	}
+async function onGot(tabs) {
+	if (tabs.length < 0)
+		return;
+	tab = tabs[0];
+	document.getElementById("site").textContent = tab.url;
+	document.getElementById("tree").setAttribute('style', 'white-space: pre;');
+	document.getElementById("tree").textContent = await browser.runtime.sendMessage({ 'id': 'getTreeForTab', 'tabId': tab.id });
 }
 
-function onError(error) {
-	console.log(`Error: ${error}`);
-}
+function onError(error) { console.log(`Error: ${error}`); }
 
 const gettingCurrent = browser.tabs.query({active: true, lastFocusedWindow: true});
 gettingCurrent.then(onGot, onError);

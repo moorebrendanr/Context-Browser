@@ -14,22 +14,33 @@ function printTree(tree) {
         console.log('tree is null');
         return;
     }
+    result = '';
     function iterator(node) {
         var depth = "", i;
-        for (i = 1; i <= node.depth; i++) depth += ">";
-        console.info([depth, node.data.url].join(" "));
+        if (node.depth == 0) {
+            result += node.data.url + '\r\n';
+        } else {
+            for (i = 1; i <= node.depth; i++) depth += ">";
+            result += ([depth, node.data.url].join(" ")) + '\r\n';
+        }
     }
     tree.traverseDown(iterator);
+    return result;
 }
 
 function onReceived(message, sender, sendResponse) {
-    if (message.id == 'enableDisable') {
+    if (message.id === 'enableDisable') {
         enabled = !enabled;
         browser.storage.local.set({ 'enabled': enabled });
     } else if (message.id === 'linkClicked') {
         console.log(`Tab ${sender.tab.id} clicked link from ${message.sourceUrl} to ${message.targetUrl}`);
         lastClickedLink = message.targetUrl;
         handleLinkClick(sender.tab, message.sourceUrl, message.targetUrl, sendResponse);
+    } else if (message.id === 'getTreeForTab') {
+        tabId = message.tabId;
+        if (!(tabId in trees))
+            sendResponse('Error: No tree found for this tab...');
+        sendResponse(printTree(trees[tabId]));
     }
 }
 
@@ -43,7 +54,7 @@ function handleLinkClick(tab, sourceUrl, targetUrl, sendResponse) {
     }
     tree = trees[tab.id];
     console.log('Old tree:');
-    printTree(tree);
+    console.log(printTree(tree));
     const srcNode = tree.find(function (node) { return node.data.url === sourceUrl; });
     if (srcNode == null) {
         console.log('Error: could not find source node for link click');
@@ -63,7 +74,7 @@ function handleLinkClick(tab, sourceUrl, targetUrl, sendResponse) {
         'targetUrl': targetUrl
     });
     console.log('New tree:');
-    printTree(tree);
+    console.log(printTree(tree));
 };
 
 
