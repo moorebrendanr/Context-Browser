@@ -40,7 +40,6 @@ function handleLinkClick(tab, sourceUrl, targetUrl, sendResponse) {
         // A tree does not exist for this, so initialize it.
         trees[tab.id] = new Arboreal(null, { 'url': sourceUrl });
         tree = trees[tab.id];
-        //tree.appendChild({ 'url': sourceUrl });
     }
     tree = trees[tab.id];
     console.log('Old tree:');
@@ -50,7 +49,13 @@ function handleLinkClick(tab, sourceUrl, targetUrl, sendResponse) {
         console.log('Error: could not find source node for link click');
         return;
     }
-    // TODO: don't open pip window if it already exists
+    // don't open duplicate child windows within a parent
+    for (const node of srcNode.children) {
+        if (node.data.url === targetUrl) {
+            console.log('Not opening new child window since it already exists within this window.');
+            return;
+        }
+    }
     srcNode.appendChild({ 'url': targetUrl });
     console.log(`Asking tab ${tab.id} to open ${targetUrl}`);
     browser.tabs.sendMessage(tab.id, {
