@@ -12,8 +12,9 @@ $("a")
 const iframes = new Map();
 var idModifier = 0;
 
-function onReceived(message) {
+function onReceived(message, sender, sendResponse) {
     if (message.id === 'openIFrame') {
+        sendResponse({});
         createIframe(message.targetUrl);
     }
 }

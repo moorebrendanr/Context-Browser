@@ -10,6 +10,10 @@ const pattern = "<all_urls>";
 let lastClickedLink = null;
 
 function printTree(tree) {
+    if (tree == null) {
+        console.log('tree is null');
+        return;
+    }
     function iterator(node) {
         var depth = "", i;
         for (i = 1; i <= node.depth; i++) depth += ">";
@@ -34,10 +38,12 @@ function handleLinkClick(tab, sourceUrl, targetUrl, sendResponse) {
     if (!(tab.id in trees)) {
         // The user opened a new tab, went to page A, and clicked on a link going to page B.
         // A tree does not exist for this, so initialize it.
-        trees[tab.id] = new Arboreal();
+        trees[tab.id] = new Arboreal(null, { 'url': sourceUrl });
         tree = trees[tab.id];
-        tree.appendChild({ 'url': sourceUrl });
+        //tree.appendChild({ 'url': sourceUrl });
     }
+    tree = trees[tab.id];
+    console.log('Old tree:');
     printTree(tree);
     const srcNode = tree.find(function (node) { return node.data.url === sourceUrl; });
     if (srcNode == null) {
@@ -47,12 +53,12 @@ function handleLinkClick(tab, sourceUrl, targetUrl, sendResponse) {
     // TODO: don't open pip window if it already exists
     srcNode.appendChild({ 'url': targetUrl });
     console.log(`Asking tab ${tab.id} to open ${targetUrl}`);
-    //lastClickedLink = null;
     browser.tabs.sendMessage(tab.id, {
         'id': 'openIFrame',
         'targetUrl': targetUrl
     });
-    //lastClickedLink = targetUrl;
+    console.log('New tree:');
+    printTree(tree);
 };
 
 
@@ -62,8 +68,8 @@ function onError(error) { console.error(`Error: ${error}`); }
 function webRequestHandler(requestDetails) {
     console.log(`Requested url: ${requestDetails.url}`);
     if (lastClickedLink === requestDetails.url) {
-        console.log("Cancelling request.");
         lastClickedLink = null;
+        console.log("Cancelling request.");
         return {"cancel": true};
     } else {
         return {"cancel": false};
