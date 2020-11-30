@@ -45,6 +45,7 @@ function createIframe(url) {
         btnMax.type = "button";
         btnMax.id = "iframeMaxBtn";
         btnMax.innerHTML = "+";
+        btnMax.onclick = function() { window.location.href = url; };
 
         btnContainer.appendChild(btnMin);
         btnContainer.appendChild(btnMax);
