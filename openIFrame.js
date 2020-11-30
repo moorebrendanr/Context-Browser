@@ -4,31 +4,69 @@ window.addEventListener("click", notifyLinkClicked);
 
 function onReceived(message) {
     if (message.id === 0) {
-        console.log("Creating iframe");
+        createIframe(message.url);
+    }
+}
+
+function createIframe(url) {
+    console.log("Creating iframe");
         let div = document.createElement("div");
         div.id = "linkPreviewContainer";
 
         let iframe = document.createElement("iframe");
-        iframe.src = message.url;
+        iframe.src = url;
         iframe.id = "linkPreviewIframe";
 
         let headerBar = document.createElement("div");
         headerBar.id = "headerBar";
 
-        let btn = document.createElement("button");
-        btn.type = "button";
-        btn.id = "iframeCloseBtn";
-        btn.innerHTML = "x";
-        btn.onclick = function() { $("#linkPreviewContainer").remove() }
+        let btnContainer = document.createElement("div");
+        btnContainer.id = "btnContainer";
 
-        headerBar.appendChild(btn);
+        let btnClose = document.createElement("button");
+        btnClose.type = "button";
+        btnClose.id = "iframeCloseBtn";
+        btnClose.innerHTML = "x";
+        btnClose.onclick = function() { $("#linkPreviewContainer").remove() };
+
+        let btnMin = document.createElement("button");
+        btnMin.type = "button";
+        btnMin.id = "iframeMinBtn";
+        btnMin.innerHTML = "–";
+        btnMin.onclick = function() { 
+            console.log("minimize clicked");
+            $("#linkPreviewContainer").css("display", "none");
+            $("#minimized").css("display", "inline");
+        };
+
+        let btnMax = document.createElement("button");
+        btnMax.type = "button";
+        btnMax.id = "iframeMaxBtn";
+        btnMax.innerHTML = "+";
+
+        btnContainer.appendChild(btnMin);
+        btnContainer.appendChild(btnMax);
+        btnContainer.appendChild(btnClose);
+        headerBar.appendChild(btnContainer);
         div.appendChild(headerBar);
         div.appendChild(iframe);
         document.body.appendChild(div);
 
+        Array.from(document.getElementsByClassName("userClicked")).forEach((el, id) => {
+            let minimized = document.createElement("button");
+            minimized.id = "minimized"; // TODO: need to change this, since IDs need to be unique.
+            minimized.type = "button";
+            minimized.innerHTML = "+";
+            minimized.style.display = "none";
+            minimized.onclick = function() {
+                this.style.display = "none";
+                $("#linkPreviewContainer").css("display", "block");
+            }
+            insertAfter(minimized, el); // TODO: should only insert if not already there.
+        });
+
         setResizable();
         dragElement(document.getElementById("linkPreviewContainer"));
-    }
 }
 
 function notifyLinkClicked(e) {
@@ -45,6 +83,7 @@ function notifyLinkClicked(e) {
 
 function handleLinkClick(el) {
     console.log('Link clicked');
+    el.classList.add("userClicked");
     browser.runtime.sendMessage({
         "id": 1,
         "url": el.href
@@ -117,6 +156,11 @@ function dragElement(elmnt) {
     document.onmouseup = null;
     document.onmousemove = null;
   }
+}
+
+// https://stackoverflow.com/a/4793630
+function insertAfter(newNode, referenceNode) {
+    referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
 }
 
 setResizable();

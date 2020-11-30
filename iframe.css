@@ -27,8 +27,20 @@
     cursor: move;
 }
 
-#iframeCloseBtn {
+#btnContainer {
     position: absolute;
     top: 0px;
     right: 0px;
 }
+
+/*#iframeCloseBtn {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+}
+
+#iframeMinBtn {
+    position: absolute;
+    top: 0px;
+    right: 25px;
+}*/
