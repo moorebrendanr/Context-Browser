@@ -10,7 +10,7 @@ $("a")
 // and a minimizedId (the minimized button for that iframe)
 // {url: {containerId, minimizedId}}
 const iframes = new Map();
-var idModifier = 0;
+let idModifier = 0;
 
 function onReceived(message, sender, sendResponse) {
     if (message.id === 'openIFrame') {
@@ -19,7 +19,6 @@ function onReceived(message, sender, sendResponse) {
     }
 }
 
-// TODO: Each link should be associated with an iframe with a unique id. Each id can only be open once.
 /**
 * Create a PiP view associated with a certain link element on the page.
 */
@@ -62,17 +61,17 @@ function createIframe(url) {
     // create the close button
     let btnClose = document.createElement("button");
     btnClose.type = "button";
-    btnClose.innerHTML = "x";
-    btnClose.onclick = function() { 
+    btnClose.classList.add("btnClose", "windowButton");
+    btnClose.onclick = function() {
         div.remove();
-        iframes.delete(url); 
+        iframes.delete(url);
     };
 
     // create the minimize button
     let btnMin = document.createElement("button");
     btnMin.type = "button";
-    btnMin.innerHTML = "–";
-    btnMin.onclick = function() { 
+    btnMin.classList.add("btnMin", "windowButton");
+    btnMin.onclick = function() {
         console.log("minimize clicked");
         div.style.display = "none";
         minimized.style.display = "inline";
@@ -81,7 +80,7 @@ function createIframe(url) {
     // create the maximize button
     let btnMax = document.createElement("button");
     btnMax.type = "button";
-    btnMax.innerHTML = "+";
+    btnMax.classList.add("btnMax", "windowButton");
     btnMax.onclick = function() {
         let currentlyMaximized = (div.clientHeight >= 0.90 * window.innerHeight && div.clientWidth >= 0.90 * window.innerWidth);
         if (currentlyMaximized) {
@@ -89,11 +88,15 @@ function createIframe(url) {
             div.style.height = '50%';
             div.style.top = '10px';
             div.style.left = '10px';
+            let url = browser.runtime.getURL("icons/maximize_26px.png");
+            btnMax.style.backgroundImage = `url(${url})`;
         } else {
             div.style.width = '100%';
             div.style.height = '100%';
             div.style.top = '0';
             div.style.left = '0';
+            let url = browser.runtime.getURL("icons/restore_down_26px.png");
+            btnMax.style.backgroundImage = `url(${url})`;
         }
     };
 

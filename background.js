@@ -17,7 +17,7 @@ function printTree(tree) {
     result = '';
     function iterator(node) {
         var depth = "", i;
-        if (node.depth == 0) {
+        if (node.depth === 0) {
             result += node.data.url + '\r\n';
         } else {
             for (i = 1; i <= node.depth; i++) depth += ">";
