@@ -1,10 +1,10 @@
 browser.runtime.onMessage.addListener(onReceived);
 
-var enabled = true;
+let enabled = true;
 
-browser.storage.local.set({ 'enabled': enabled });
+browser.storage.local.set({'enabled': enabled}).then(r => console.log(r));
 
-var trees = {};
+const trees = {};
 
 const pattern = "<all_urls>";
 let lastClickedLink = null;
@@ -14,9 +14,9 @@ function printTree(tree) {
         console.log('tree is null');
         return;
     }
-    result = '';
+    let result = '';
     function iterator(node) {
-        var depth = "", i;
+        let depth = "", i;
         if (node.depth === 0) {
             result += node.data.url + '\r\n';
         } else {
@@ -29,13 +29,14 @@ function printTree(tree) {
 }
 
 function onReceived(message, sender, sendResponse) {
+    let tabId;
     if (message.id === 'enableDisable') {
         enabled = !enabled;
-        browser.storage.local.set({ 'enabled': enabled });
+        browser.storage.local.set({'enabled': enabled}).then(r => console.log(r));
     } else if (message.id === 'linkClicked') {
         console.log(`Tab ${sender.tab.id} clicked link from ${message.sourceUrl} to ${message.targetUrl}`);
         lastClickedLink = message.targetUrl;
-        handleLinkClick(sender.tab, message.sourceUrl, message.targetUrl, sendResponse);
+        handleLinkClick(sender.tab, message.sourceUrl, message.targetUrl);
     } else if (message.id === 'getTreeForTab') {
         tabId = message.tabId;
         if (!(tabId in trees))
@@ -44,13 +45,13 @@ function onReceived(message, sender, sendResponse) {
     }
 }
 
-function handleLinkClick(tab, sourceUrl, targetUrl, sendResponse) {
-    let tree = null;
+function handleLinkClick(tab, sourceUrl, targetUrl) {
+    let tree;
     if (!(tab.id in trees)) {
         // The user opened a new tab, went to page A, and clicked on a link going to page B.
         // A tree does not exist for this, so initialize it.
         trees[tab.id] = new Arboreal(null, { 'url': sourceUrl });
-        tree = trees[tab.id];
+        // tree = trees[tab.id];
     }
     tree = trees[tab.id];
     console.log('Old tree:');
@@ -72,14 +73,14 @@ function handleLinkClick(tab, sourceUrl, targetUrl, sendResponse) {
     browser.tabs.sendMessage(tab.id, {
         'id': 'openIFrame',
         'targetUrl': targetUrl
-    });
+    }).then(r => console.log(r));
     console.log('New tree:');
     console.log(printTree(tree));
-};
+}
 
 
 
-function onError(error) { console.error(`Error: ${error}`); }
+// function onError(error) { console.error(`Error: ${error}`); }
 
 function webRequestHandler(requestDetails) {
     console.log(`Requested url: ${requestDetails.url}`);

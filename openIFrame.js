@@ -20,8 +20,8 @@ function onReceived(message, sender, sendResponse) {
 }
 
 /**
-* Create a PiP view associated with a certain link element on the page.
-*/
+ * Create a PiP view associated with a certain link element on the page.
+ */
 function createIframe(url) {
     console.log("Creating iframe");
     let containerId = "linkPreviewContainer" + idModifier;
@@ -33,7 +33,7 @@ function createIframe(url) {
     minimized.type = "button";
     minimized.innerHTML = "+";
     minimized.style.display = "none";
-    minimized.onclick = function() {
+    minimized.onclick = function () {
         this.style.display = "none";
         div.style.display = "block";
     };
@@ -62,7 +62,7 @@ function createIframe(url) {
     let btnClose = document.createElement("button");
     btnClose.type = "button";
     btnClose.classList.add("btnClose", "windowButton");
-    btnClose.onclick = function() {
+    btnClose.onclick = function () {
         div.remove();
         iframes.delete(url);
     };
@@ -71,7 +71,7 @@ function createIframe(url) {
     let btnMin = document.createElement("button");
     btnMin.type = "button";
     btnMin.classList.add("btnMin", "windowButton");
-    btnMin.onclick = function() {
+    btnMin.onclick = function () {
         console.log("minimize clicked");
         div.style.display = "none";
         minimized.style.display = "inline";
@@ -81,7 +81,7 @@ function createIframe(url) {
     let btnMax = document.createElement("button");
     btnMax.type = "button";
     btnMax.classList.add("btnMax", "windowButton");
-    btnMax.onclick = function() {
+    btnMax.onclick = function () {
         let currentlyMaximized = (div.clientHeight >= 0.90 * window.innerHeight && div.clientWidth >= 0.90 * window.innerWidth);
         if (currentlyMaximized) {
             div.style.width = '50%';
@@ -112,14 +112,14 @@ function createIframe(url) {
     // Add the ids to the map
     let pair = {containerId: containerId, minimizedId: minimizedId};
     iframes.set(url, pair);
-    
+
     dragElement(div);
     // setResizable(containerId);
     idModifier++;
 }
 
 function notifyLinkClicked(e) {
-    var el = e.target;
+    let el = e.target;
     while (el.tagName !== "A" && el !== el.parentNode)
         el = el.parentNode;
     if (el.tagName === "A") {
@@ -138,14 +138,14 @@ function handleLinkClick(el) {
         "id": 'linkClicked',
         "sourceUrl": document.location.href,
         "targetUrl": el.href
-    });
+    }).then(r => console.log(r));
 }
 
 function setResizable(id) {
     console.log("set resizable");
     // https://stackoverflow.com/a/22720042
-    $("#"+id).resizable({
-        start: function(event, ui) {
+    $("#" + id).resizable({
+        start: function (event, ui) {
             ui.element.append($("<div/>", {
                 id: "iframe-barrier",
                 css: {
@@ -158,10 +158,10 @@ function setResizable(id) {
                 }
             }));
         },
-        stop: function(event, ui) {
+        stop: function (event, ui) {
             $("#iframe-barrier", ui.element).remove();
         },
-        resize: function(event, ui) {
+        resize: function (event, ui) {
             $("iframe", ui.element).width(ui.size.width).height(ui.size.height - 20); // leave room for the header bar
         }
     });
@@ -169,39 +169,39 @@ function setResizable(id) {
 
 // https://www.w3schools.com/howto/howto_js_draggable.asp
 function dragElement(elmnt) {
-  var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-  elmnt.firstChild.onmousedown = dragMouseDown;
+    let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+    elmnt.firstChild.onmousedown = dragMouseDown;
 
-  function dragMouseDown(e) {
-    console.log("header clicked");
-    e = e || window.event;
-    e.preventDefault();
-    // get the mouse cursor position at startup:
-    pos3 = e.clientX;
-    pos4 = e.clientY;
-    document.onmouseup = closeDragElement;
-    // call a function whenever the cursor moves:
-    document.onmousemove = elementDrag;
-  }
+    function dragMouseDown(e) {
+        console.log("header clicked");
+        e = e || window.event;
+        e.preventDefault();
+        // get the mouse cursor position at startup:
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        document.onmouseup = closeDragElement;
+        // call a function whenever the cursor moves:
+        document.onmousemove = elementDrag;
+    }
 
-  function elementDrag(e) {
-    e = e || window.event;
-    e.preventDefault();
-    // calculate the new cursor position:
-    pos1 = pos3 - e.clientX;
-    pos2 = pos4 - e.clientY;
-    pos3 = e.clientX;
-    pos4 = e.clientY;
-    // set the element's new position:
-    elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
-    elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
-  }
+    function elementDrag(e) {
+        e = e || window.event;
+        e.preventDefault();
+        // calculate the new cursor position:
+        pos1 = pos3 - e.clientX;
+        pos2 = pos4 - e.clientY;
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        // set the element's new position:
+        elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+        elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+    }
 
-  function closeDragElement() {
-    // stop moving when mouse button is released:
-    document.onmouseup = null;
-    document.onmousemove = null;
-  }
+    function closeDragElement() {
+        // stop moving when mouse button is released:
+        document.onmouseup = null;
+        document.onmousemove = null;
+    }
 }
 
 // https://stackoverflow.com/a/4793630
