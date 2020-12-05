@@ -26,20 +26,6 @@ function createIframe(url) {
     console.log("Creating iframe");
     let containerId = "linkPreviewContainer" + idModifier;
 
-    // Create the minimized button
-    let minimized = document.createElement("button");
-    let minimizedId = "minimized" + idModifier;
-    minimized.id = minimizedId;
-    minimized.type = "button";
-    minimized.innerHTML = "+";
-    minimized.style.display = "none";
-    minimized.onclick = function () {
-        this.style.display = "none";
-        div.style.display = "block";
-    };
-    let element = $(`.userClicked${idModifier}`)[0];
-    insertAfter(minimized, element);
-
     // Create the containing div
     let div = document.createElement("div");
     div.id = containerId;
@@ -57,6 +43,21 @@ function createIframe(url) {
     // create the button container
     let btnContainer = document.createElement("div");
     btnContainer.classList.add("btnContainer");
+
+    // Create the minimized button
+    let minimized = document.createElement("button");
+    let minimizedId = "minimized" + idModifier;
+    minimized.id = minimizedId;
+    minimized.type = "button";
+    minimized.innerHTML = "+";
+    minimized.style.display = "none";
+    minimized.style.backgroundColor = "red";
+    minimized.onclick = function () {
+        this.style.display = "none";
+        div.style.display = "block";
+    };
+    let element = $(`.userClicked${idModifier}`)[0];
+    insertAfter(minimized, element);
 
     // create the close button
     let btnClose = document.createElement("button");
@@ -183,7 +184,7 @@ function dragElement(elmnt) {
             id: "iframe-barrier",
             css: {
                 position: "absolute",
-                top: 0,
+                top: 20,
                 right: 0,
                 bottom: 0,
                 left: 0,
