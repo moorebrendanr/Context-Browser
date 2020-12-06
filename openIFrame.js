@@ -115,15 +115,17 @@ function createIframe(url) {
     iframes.set(url, pair);
 
     dragElement(div);
-    // setResizable(containerId);
+    setResizable(div);
     idModifier++;
 }
 
 function notifyLinkClicked(e) {
     let el = e.target;
-    while (el.tagName !== "A" && el !== el.parentNode)
+    while (el.tagName !== "A" && el !== el.parentNode) {
         el = el.parentNode;
-    if (el.tagName === "A") {
+        if (el == null) break;
+    }
+    if (el != null && el.tagName === "A") {
         browser.storage.local.get('enabled').then(function (data) {
             if (data['enabled'])
                 handleLinkClick(el)
@@ -142,10 +144,10 @@ function handleLinkClick(el) {
     }).then(r => console.log(r));
 }
 
-function setResizable(id) {
+function setResizable(el) {
     console.log("set resizable");
     // https://stackoverflow.com/a/22720042
-    $("#" + id).resizable({
+    $(el).resizable({
         start: function (event, ui) {
             ui.element.append($("<div/>", {
                 id: "iframe-barrier",
