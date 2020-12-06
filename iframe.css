@@ -1,5 +1,5 @@
 .linkPreviewContainer {
-    position: fixed;
+    position: fixed !important;
     display: block;
     width: 50%;
     height: 50%;
