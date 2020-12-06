@@ -48,10 +48,7 @@ function onReceived(message, sender, sendResponse) {
 function handleLinkClick(tab, sourceUrl, targetUrl) {
     let tree;
     if (!(tab.id in trees)) {
-        // The user opened a new tab, went to page A, and clicked on a link going to page B.
-        // A tree does not exist for this, so initialize it.
-        trees[tab.id] = new Arboreal(null, { 'url': sourceUrl });
-        // tree = trees[tab.id];
+        initializeTree(tab.id, sourceUrl);
     }
     tree = trees[tab.id];
     console.log('Old tree:');
@@ -61,6 +58,7 @@ function handleLinkClick(tab, sourceUrl, targetUrl) {
         console.log('Error: could not find source node for link click');
         return;
     }
+    console.log(`Current node:\n\turl: ${srcNode.data.url}\n\timage: ${srcNode.data.imageUri}`);
     // don't open duplicate child windows within a parent
     for (const node of srcNode.children) {
         if (node.data.url === targetUrl) {
@@ -72,15 +70,22 @@ function handleLinkClick(tab, sourceUrl, targetUrl) {
     console.log(`Asking tab ${tab.id} to open ${targetUrl}`);
     browser.tabs.sendMessage(tab.id, {
         'id': 'openIFrame',
-        'targetUrl': targetUrl
+        'targetUrl': targetUrl,
+        'upThumbnail': srcNode.data.imageUri
     }).then(r => console.log(r));
     console.log('New tree:');
     console.log(printTree(tree));
 }
 
+function initializeTree(tabId, url, imageUri) {
+    if (imageUri) {
+        trees[tabId] = new Arboreal(null, {'url': url, 'imageUri': imageUri});
+    } else {
+        trees[tabId] = new Arboreal(null, {'url': url});
+    }
+}
 
-
-// function onError(error) { console.error(`Error: ${error}`); }
+function onError(error) { console.error(`Error: ${error}`); }
 
 function webRequestHandler(requestDetails) {
     console.log(`Requested url: ${requestDetails.url}`);
@@ -98,8 +103,6 @@ browser.webRequest.onBeforeRequest.addListener(
     {urls: [pattern]},
     ["blocking"]
 );
-
-
 
 // https://usamaejaz.com/bypassing-security-iframe-webextension/
 browser.webRequest.onHeadersReceived.addListener(info => {
@@ -133,3 +136,15 @@ browser.webRequest.onHeadersReceived.addListener(info => {
     urls: [ "<all_urls>" ], // match all pages
     types: [ "sub_frame" ] // for framing only
 }, ["blocking", "responseHeaders"]);
+
+// Initialize state on page load completed
+browser.webNavigation.onCompleted.addListener(details => {
+    // Initialize tree if it doesn't already exist
+    if (!(details.tabId in trees)) {
+        browser.tabs.captureVisibleTab()
+            .then(imageUri => {
+                console.log(`Setting data for tab ${details.tabId} with url ${details.url} and image ${imageUri}`);
+                initializeTree(details.tabId, details.url, imageUri);
+            }, onError);
+    }
+});

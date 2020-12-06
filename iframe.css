@@ -67,3 +67,13 @@
     background-image: url("icons/minimize_50px.png");
     background-size: 85% 85%;
 }
+
+.upThumbnail {
+    position: absolute;
+    top: 20px;
+    left: 0;
+    width: 10%;
+    border: 1px solid red;
+    border-radius: 4px;
+    padding: 1px;
+}

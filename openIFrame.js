@@ -15,14 +15,15 @@ let idModifier = 0;
 function onReceived(message, sender, sendResponse) {
     if (message.id === 'openIFrame') {
         sendResponse({});
-        createIframe(message.targetUrl);
+        console.log("Received image: "+message.upThumbnail);
+        createIframe(message.targetUrl, message.upThumbnail);
     }
 }
 
 /**
  * Create a PiP view associated with a certain link element on the page.
  */
-function createIframe(url) {
+function createIframe(url, upThumbnail) {
     console.log("Creating iframe");
     let containerId = "linkPreviewContainer" + idModifier;
 
@@ -101,6 +102,8 @@ function createIframe(url) {
         }
     };
 
+
+
     // put the elements together
     btnContainer.appendChild(btnMin);
     btnContainer.appendChild(btnMax);
@@ -108,6 +111,13 @@ function createIframe(url) {
     headerBar.appendChild(btnContainer);
     div.appendChild(headerBar);
     div.appendChild(iframe);
+    if (upThumbnail) {
+        console.log("Setting up thumbnail");
+        let thumbnailImg = document.createElement("img");
+        thumbnailImg.classList.add("upThumbnail");
+        thumbnailImg.src = upThumbnail;
+        div.appendChild(thumbnailImg);
+    }
     document.body.appendChild(div);
 
     // Add the ids to the map
@@ -163,6 +173,10 @@ function setResizable(el) {
         },
         stop: function (event, ui) {
             $("#iframe-barrier", ui.element).remove();
+            $("iframe", ui.element).css({
+                width: "100%",
+                height: "calc(100% - 20px)"
+            });
         },
         resize: function (event, ui) {
             $("iframe", ui.element).width(ui.size.width).height(ui.size.height - 20); // leave room for the header bar
