@@ -144,6 +144,9 @@ function notifyLinkClicked(e) {
         el = el.parentNode;
         if (el == null) break;
     }
+    // don't trigger on JS action hrefs, such as javascript:void(0)
+    if (el.href.startsWith('javascript:'))
+        return;
     if (el != null && el.tagName === "A") {
         browser.storage.local.get('enabled').then(data => {
             if (data['enabled'])
