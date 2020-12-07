@@ -175,12 +175,21 @@ function addSave(tab) {
     if (!(tab.id in trees))
         return;
 
+    let tree = trees[tab.id];
+
+    let numNodes = 0;
+    tree.traverseDown((node) => {
+        ++numNodes;
+    });
+    console.log('nn: ' + numNodes);
+
     let newSave = {
         'id': nanoid(),
         'url': tab.url,
         'faviconUrl': tab.favIconUrl,
-        'tree': trees[tab.id],
-        'date': new Date()
+        'tree': tree,
+        'date': new Date(),
+        'numNodes': numNodes
     };
 
     browser.storage.local.get('saves').then(data => {

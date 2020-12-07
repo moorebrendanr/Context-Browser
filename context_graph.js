@@ -38,13 +38,35 @@ async function getSavedContexts() {
     let storageResult = await browser.storage.local.get('saves');
     saves = storageResult.saves;
     for (const save of saves) {
-        text = `Save of ${save.url} at ${save.date}`;
-        console.log(text);
+        //text = `${save.url}${dateToString(save.date)}`;
+        //console.log(text);
+        var img = document.createElement('img');
+        img.src = save.faviconUrl;
+        img.width = 16;
+        img.height = 16;
         var p = document.createElement('p');
-        var pt = document.createTextNode(text);
-        p.appendChild(pt);
+        p.appendChild(img);
+        p.appendChild(document.createTextNode(' '));
+        p.appendChild(document.createTextNode(`${save.url}`));
+        p.appendChild(document.createElement('br'));
+        p.appendChild(document.createTextNode(`Saved ${dateToString(save.date)}`));
+        p.appendChild(document.createElement('br'));
+        p.appendChild(document.createTextNode(`${save.numNodes} pages`));
         contextsDiv.append(p);
     }
 }
 
 getSavedContexts();
+
+function dateToString(d) {
+    var y = d.getFullYear();
+    var m = d.getMonth() + 1;
+    if (m < 10) m = '0'+m;
+    var day = d.getDate();
+    if (day < 10) day = '0'+day;
+    var h = d.getHours();
+    if (h < 10) h = '0'+h;
+    var min = d.getMinutes();
+    if (min < 10) min = '0'+min;
+    return y + '-' + m + '-' + day + ' @ ' + h + ':' + min;
+}
