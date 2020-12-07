@@ -16,14 +16,18 @@ function onReceived(message, sender, sendResponse) {
     if (message.id === 'openIFrame') {
         sendResponse({});
         console.log("Received image: "+message.upThumbnail);
-        createIframe(message.targetUrl, message.upThumbnail);
+        createIframe(message);
     }
 }
 
 /**
  * Create a PiP view associated with a certain link element on the page.
  */
-function createIframe(url, upThumbnail) {
+function createIframe(data) {
+    let url = data.targetUrl;
+    let upThumbnail = data.upThumbail;
+    let windowId = data.windowId;
+
     console.log("Creating iframe");
     let containerId = "linkPreviewContainer" + idModifier;
 
@@ -34,6 +38,7 @@ function createIframe(url, upThumbnail) {
 
     // create the iframe
     let iframe = document.createElement("iframe");
+    iframe.ctxBrowserId = windowId;
     iframe.src = url;
     iframe.classList.add("linkPreviewIframe");
 

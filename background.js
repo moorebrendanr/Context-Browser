@@ -9,6 +9,21 @@ browser.storage.local.get('enabled').then(data => {
         browser.storage.local.set({'enabled': enabled});
 });
 
+let windowId = 0;
+browser.storage.local.get('windowId').then(data => {
+    if ('windowId' in data)
+        windowId = data['windowId'];
+    else
+        browser.storage.local.set({'windowId': windowId});
+});
+
+function getNewWindowId() {
+    // JS 'integers' can safely increment to (2^53)-1 ≈ 9 quadrillion
+    // so no need for any sort of overflow detection/handling
+    browser.storage.local.set({'windowId': ++windowId});
+    return windowId;
+}
+
 const trees = {};
 
 const pattern = "<all_urls>";
@@ -27,7 +42,7 @@ function printTree(tree) {
             result += node.data.url + '\r\n';
         } else {
             for (i = 1; i <= node.depth; i++) depth += ">";
-            result += ([depth, node.data.url].join(" ")) + '\r\n';
+            result += `${depth} ${node.data.id} ${node.data.url}\r\n`
         }
     }
     tree.traverseDown(iterator);
@@ -71,6 +86,7 @@ function handleLinkClick(tab, sourceUrl, targetUrl) {
     console.log(printTree(tree));
     // TODO: This doesn't work if there is another node with the same URL. EX: you navigate on Wikipedia
     //       from Bird -> Feather -> Bird -> Wing
+    // Update this to use window IDs instead of URLs
     const srcNode = tree.find(function (node) { return node.data.url === sourceUrl; });
     if (srcNode == null) {
         console.log('Error: could not find source node for link click');
@@ -84,10 +100,15 @@ function handleLinkClick(tab, sourceUrl, targetUrl) {
             return;
         }
     }
-    srcNode.appendChild({ 'url': targetUrl });
+    let newWindowId = getNewWindowId();
+    srcNode.appendChild({
+        'url': targetUrl,
+        'id': newWindowId
+    });
     console.log(`Asking tab ${tab.id} to open ${targetUrl}`);
     browser.tabs.sendMessage(tab.id, {
         'id': 'openIFrame',
+        'windowId': newWindowId,
         'targetUrl': targetUrl,
         'upThumbnail': srcNode.data.imageUri
     }).then(r => console.log(r));
@@ -96,11 +117,14 @@ function handleLinkClick(tab, sourceUrl, targetUrl) {
 }
 
 function initializeTree(tabId, url, imageUri) {
-    if (imageUri) {
-        trees[tabId] = new Arboreal(null, {'url': url, 'imageUri': imageUri});
-    } else {
-        trees[tabId] = new Arboreal(null, {'url': url});
-    }
+    let newNode = {};
+    console.log('ghk');
+    Object.assign(newNode,
+        { 'url': url },
+        { 'id': getNewWindowId() },
+        imageUri ? { 'imageUri' : imageUri } : null);
+    console.log(newNode);
+    trees[tabId] = new Arboreal(null, newNode);
 }
 
 function onError(error) { console.error(`Error: ${error}`); }
