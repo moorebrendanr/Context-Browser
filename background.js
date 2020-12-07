@@ -93,8 +93,8 @@ function onReceived(message, sender, sendResponse) {
             break;
         case 'saveCurrentTab':
             browser.tabs.query({currentWindow: true, active: true}).then((tabs) => {
-                addSave(tabs[0]);
-                sendResponse(null); // so the popup knows to refresh the save list
+                addSave(tabs[0]).then(() => sendResponse(null));
+                // send response when done so the popup knows to refresh the save list
             });
             break;
         default:
@@ -170,7 +170,7 @@ function getSaves() {
     });
 }
 
-function addSave(tab) {
+async function addSave(tab) {
     console.log(`adding save for tab ${tab.id}`);
     if (!(tab.id in trees))
         return;
@@ -178,10 +178,9 @@ function addSave(tab) {
     let tree = trees[tab.id];
 
     let numNodes = 0;
-    tree.traverseDown((node) => {
-        ++numNodes;
-    });
-    console.log('nn: ' + numNodes);
+    tree.traverseDown((node) => { ++numNodes; });
+
+    let screenshot = await browser.tabs.captureVisibleTab();
 
     let newSave = {
         'id': nanoid(),
@@ -189,7 +188,8 @@ function addSave(tab) {
         'faviconUrl': tab.favIconUrl,
         'tree': tree,
         'date': new Date(),
-        'numNodes': numNodes
+        'numNodes': numNodes,
+        'screenshot': screenshot
     };
 
     browser.storage.local.get('saves').then(data => {

@@ -1,3 +1,10 @@
+// For some reason specifying this CSS in the HTML as style='...' doesn't work...
+// Firefox imposes a limit of 800x600 so it won't grow beyond that.
+$('body').css({
+    'width': 1000,
+    'height': 1400
+});
+
 const edb = $('#enableDisableButton');
 const saveButton = $('#saveButton');
 const contextsDiv = $('#contexts');
@@ -37,15 +44,14 @@ async function getSavedContexts() {
     var saves;
     let storageResult = await browser.storage.local.get('saves');
     saves = storageResult.saves;
+    contextsDiv.empty();
     for (const save of saves) {
-        //text = `${save.url}${dateToString(save.date)}`;
-        //console.log(text);
-        var img = document.createElement('img');
-        img.src = save.faviconUrl;
-        img.width = 16;
-        img.height = 16;
+        var favicon = document.createElement('img');
+        favicon.src = save.faviconUrl;
+        favicon.width = 16;
+        favicon.height = 16;
         var p = document.createElement('p');
-        p.appendChild(img);
+        p.appendChild(favicon);
         p.appendChild(document.createTextNode(' '));
         p.appendChild(document.createTextNode(`${save.url}`));
         p.appendChild(document.createElement('br'));
@@ -53,6 +59,13 @@ async function getSavedContexts() {
         p.appendChild(document.createElement('br'));
         p.appendChild(document.createTextNode(`${save.numNodes} pages`));
         contextsDiv.append(p);
+        var screenshot = document.createElement('img');
+        screenshot.src = save.screenshot;
+        screenshot.style.maxWidth = '80%';
+        screenshot.style.maxHeight = '150px';
+        screenshot.style.width = 'auto';
+        screenshot.style.height = 'auto';
+        contextsDiv.append(screenshot);
     }
 }
 
