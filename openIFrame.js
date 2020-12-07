@@ -158,9 +158,10 @@ function notifyLinkClicked(e) {
 function handleLinkClick(el) {
     console.log('Link clicked');
     browser.runtime.sendMessage({
-        "id": 'linkClicked',
-        "sourceUrl": document.location.href,
-        "targetUrl": el.href
+        'id': 'linkClicked',
+        'sourceUrl': document.location.href,
+        'targetUrl': el.href,
+        'linkText': el.textContent
     }).then(r => {
         el.classList.add("userClicked" + r.windowId);
         createIframe(r);

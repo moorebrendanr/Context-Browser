@@ -73,7 +73,7 @@ function onReceived(message, sender, sendResponse) {
         case 'linkClicked':
             console.log(`Tab ${sender.tab.id} clicked link from ${message.sourceUrl} to ${message.targetUrl}`);
             lastClickedLink = message.targetUrl;
-            let newWindowData = handleLinkClick(sender.tab, message.sourceUrl, message.targetUrl);
+            let newWindowData = handleLinkClick(sender.tab, message);
             if (newWindowData !== null) {
                 console.log(`Asking tab ${sender.tab.id} to open ${message.targetUrl}`);
                 sendResponse(newWindowData);
@@ -114,7 +114,9 @@ function onReceived(message, sender, sendResponse) {
 
 // check whether a new window should be created
 // returns either null or the data required for a new window
-function handleLinkClick(tab, sourceUrl, targetUrl) {
+function handleLinkClick(tab, message) {
+    let sourceUrl = message.sourceUrl;
+    let targetUrl = message.targetUrl;
     let tree;
     if (!(tab.id in trees)) {
         initializeTree(tab.id, sourceUrl);
@@ -139,17 +141,21 @@ function handleLinkClick(tab, sourceUrl, targetUrl) {
         }
     }
     let newWindowId = getNewWindowId();
-    srcNode.appendChild({
-        'url': targetUrl,
-        'id': newWindowId,
-        'date': new Date()
-    });
-    return {
+    openingData = {
         'id': 'openIFrame',
         'windowId': newWindowId,
         'targetUrl': targetUrl,
-        'upThumbnail': srcNode.data.imageUri
+        'upThumbnail': srcNode.data.imageUri,
+        'openingLinkHref': targetUrl,
+        'openingLinkText': message.linkText
     };
+    srcNode.appendChild({
+        'url': targetUrl,
+        'id': newWindowId,
+        'date': new Date(),
+        'openingData': openingData
+    });
+    return openingData;
 }
 
 function initializeTree(tabId, url, imageUri) {
