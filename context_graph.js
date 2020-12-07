@@ -2,6 +2,9 @@ const edb = $('#enableDisableButton');
 const saveButton = $('#saveButton');
 const contextsDiv = $('#contexts');
 
+$('#clearLocalStorage').click(() =>
+    browser.runtime.sendMessage({ 'id': 'clearLocalStorage' }));
+
 // set initial state of enable/disable button based on whether currently enabled
 browser.storage.local.get('enabled').then(
     e => edb.text(e['enabled'] ? 'Disable' : 'Enable'));

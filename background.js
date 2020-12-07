@@ -3,26 +3,27 @@ console.log(nanoid());
 browser.runtime.onMessage.addListener(onReceived);
 
 let enabled = true;
-
-browser.storage.local.get('enabled').then(data => {
-    if ('enabled' in data)
-        enabled = data['enabled'];
-    else
-        browser.storage.local.set({'enabled': enabled});
-});
-
 let windowId = 0;
-browser.storage.local.get('windowId').then(data => {
-    if ('windowId' in data)
-        windowId = data['windowId'];
-    else
-        browser.storage.local.set({'windowId': windowId});
-});
 
-browser.storage.local.get('saves').then(data => {
-    if (!('saves' in data))
-        browser.storage.local.set({'saves': []});
-});
+function initLocalStorage() {
+    browser.storage.local.get('enabled').then(data => {
+        if ('enabled' in data)
+            enabled = data['enabled'];
+        else
+            browser.storage.local.set({'enabled': enabled});
+    });
+    browser.storage.local.get('windowId').then(data => {
+        if ('windowId' in data)
+            windowId = data['windowId'];
+        else
+            browser.storage.local.set({'windowId': windowId});
+    });
+    browser.storage.local.get('saves').then(data => {
+        if (!('saves' in data))
+            browser.storage.local.set({'saves': []});
+    });
+}
+initLocalStorage();
 
 function getNewWindowId() {
     // JS 'integers' can safely increment to (2^53)-1 ≈ 9 quadrillion
@@ -60,6 +61,10 @@ function onReceived(message, sender, sendResponse) {
     if ('tab' in sender)
         tabId = sender.tab.id;
     switch (message.id) {
+        case 'clearLocalStorage':
+            browser.storage.local.clear();
+            initLocalStorage();
+            break;
         case 'enableDisable':
             enabled = !enabled;
             browser.storage.local.set({'enabled': enabled});
