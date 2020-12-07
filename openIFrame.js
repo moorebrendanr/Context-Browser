@@ -102,8 +102,6 @@ function createIframe(url, upThumbnail) {
         }
     };
 
-
-
     // put the elements together
     btnContainer.appendChild(btnMin);
     btnContainer.appendChild(btnMax);
@@ -127,6 +125,15 @@ function createIframe(url, upThumbnail) {
     dragElement(div);
     setResizable(div);
     idModifier++;
+    notifyIframeCreated(url, iframe.getBoundingClientRect())
+}
+
+function notifyIframeCreated(url, boundingBox) {
+    browser.runtime.sendMessage({
+        "id": "iframeCreated",
+        "url": url,
+        "boundingBox": boundingBox
+    }).then(r => console.log(r))
 }
 
 function notifyLinkClicked(e) {

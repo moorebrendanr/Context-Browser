@@ -8,6 +8,7 @@ const trees = {};
 
 const pattern = "<all_urls>";
 let lastClickedLink = null;
+let needsScreenshot = new Map();
 
 function printTree(tree) {
     if (tree == null) {
@@ -30,18 +31,28 @@ function printTree(tree) {
 
 function onReceived(message, sender, sendResponse) {
     let tabId;
-    if (message.id === 'enableDisable') {
-        enabled = !enabled;
-        browser.storage.local.set({'enabled': enabled}).then(r => console.log(r));
-    } else if (message.id === 'linkClicked') {
-        console.log(`Tab ${sender.tab.id} clicked link from ${message.sourceUrl} to ${message.targetUrl}`);
-        lastClickedLink = message.targetUrl;
-        handleLinkClick(sender.tab, message.sourceUrl, message.targetUrl);
-    } else if (message.id === 'getTreeForTab') {
-        tabId = message.tabId;
-        if (!(tabId in trees))
-            sendResponse('Error: No tree found for this tab...');
-        sendResponse(printTree(trees[tabId]));
+    switch (message.id) {
+        case 'enableDisable':
+            enabled = !enabled;
+            browser.storage.local.set({'enabled': enabled}).then(r => console.log(r));
+            break;
+        case 'linkClicked':
+            console.log(`Tab ${sender.tab.id} clicked link from ${message.sourceUrl} to ${message.targetUrl}`);
+            lastClickedLink = message.targetUrl;
+            handleLinkClick(sender.tab, message.sourceUrl, message.targetUrl);
+            break;
+        case 'getTreeForTab':
+            tabId = message.tabId;
+            if (!(tabId in trees))
+                sendResponse('Error: No tree found for this tab...');
+            sendResponse(printTree(trees[tabId]));
+            break;
+        case 'iframeCreated':
+            console.log(`Waiting for ${message.url} to load...`);
+            needsScreenshot.set(message.url, message.boundingBox);
+            break;
+        default:
+            console.log(`Unknown message id: ${message.id}`);
     }
 }
 
@@ -53,6 +64,8 @@ function handleLinkClick(tab, sourceUrl, targetUrl) {
     tree = trees[tab.id];
     console.log('Old tree:');
     console.log(printTree(tree));
+    // TODO: This doesn't work if there is another node with the same URL. EX: you navigate on Wikipedia
+    //       from Bird -> Feather -> Bird -> Wing
     const srcNode = tree.find(function (node) { return node.data.url === sourceUrl; });
     if (srcNode == null) {
         console.log('Error: could not find source node for link click');
@@ -146,5 +159,30 @@ browser.webNavigation.onCompleted.addListener(details => {
                 console.log(`Setting data for tab ${details.tabId} with url ${details.url} and image ${imageUri}`);
                 initializeTree(details.tabId, details.url, imageUri);
             }, onError);
+    } else {
+        console.log(`Searching for url ${details.url}...`);
+        console.log(needsScreenshot);
+        for (let [key, value] of needsScreenshot.entries()) {
+            console.log(key + "===" + details.url);
+            if (key === details.url) {
+                console.log("Waiting for iframe capture...");
+                browser.tabs.captureVisibleTab(browser.windows.WINDOW_ID_CURRENT, {
+                    rect: {
+                        x: value.x,
+                        y: value.y,
+                        width: value.width,
+                        height: value.height
+                    }
+                }).then(imageUri => {
+                    console.log("Capturing iframe");
+                    const node = trees[details.tabId].find(function (node) {
+                        return node.data.url === details.url;
+                    });
+                    node.data.imageUri = imageUri;
+                }, onError);
+                break;
+            }
+        }
+        needsScreenshot.delete(details.url);
     }
 });
