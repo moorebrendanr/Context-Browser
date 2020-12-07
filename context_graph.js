@@ -24,20 +24,6 @@ edb.click(function() {
     browser.runtime.sendMessage({ 'id': 'enableDisable' });
 });
 
-async function onGot(tabs) {
-    if (tabs.length < 0)
-        return;
-    tab = tabs[0];
-    document.getElementById("site").textContent = tab.url;
-    document.getElementById("tree").setAttribute('style', 'white-space: pre;');
-    document.getElementById("tree").textContent = await browser.runtime.sendMessage({ 'id': 'getTreeForTab', 'tabId': tab.id });
-}
-
-function onError(error) { console.log(`Error: ${error}`); }
-
-const gettingCurrent = browser.tabs.query({active: true, lastFocusedWindow: true});
-gettingCurrent.then(onGot, onError);
-
 async function getSavedContexts() {
     var saves;
     let storageResult = await browser.storage.local.get('saves');
@@ -69,6 +55,8 @@ async function getSavedContexts() {
             p.appendChild(document.createTextNode('1 page'));
         else
             p.appendChild(document.createTextNode(`${save.numNodes} pages`));
+        p.appendChild(document.createElement('br'));
+        p.appendChild(document.createTextNode(`Id: ${save.id}`));
         p.appendChild(document.createElement('br'));
 
         var restoreButton = document.createElement('button');
