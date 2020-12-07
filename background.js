@@ -306,9 +306,8 @@ browser.webNavigation.onCompleted.addListener(details => {
                     }
                 }).then(imageUri => {
                     console.log("Capturing iframe");
-                    const node = trees[details.tabId].find(function (node) {
-                        return node.data.url === details.url;
-                    });
+                    const node = trees[details.tabId].find(node =>
+                        node.data.url === details.url);
                     node.data.imageUri = imageUri;
                 }, onError);
                 break;

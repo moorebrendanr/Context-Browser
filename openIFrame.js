@@ -19,7 +19,7 @@ function onReceived(message, sender, sendResponse) {
  */
 function createIframe(data) {
     let url = data.targetUrl;
-    let upThumbnail = data.upThumbail;
+    let upThumbnail = data.upThumbnail;
     let windowId = data.windowId;
 
     console.log("Creating iframe with id " + windowId);
