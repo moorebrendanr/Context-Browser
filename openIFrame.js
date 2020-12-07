@@ -66,6 +66,10 @@ function createIframe(data) {
     btnClose.onclick = function () {
         div.remove();
         iframes.delete(url);
+        browser.runtime.sendMessage({
+            'id': 'iframeClosed',
+            'windowId': windowId
+        });
     };
 
     // create the minimize button
@@ -131,7 +135,7 @@ function notifyIframeCreated(url, boundingBox) {
         "id": "iframeCreated",
         "url": url,
         "boundingBox": boundingBox
-    }).then(r => console.log(r))
+    })
 }
 
 function notifyLinkClicked(e) {
@@ -150,7 +154,6 @@ function notifyLinkClicked(e) {
 
 function handleLinkClick(el) {
     console.log('Link clicked');
-    // give the element a unique class to find it later
     browser.runtime.sendMessage({
         "id": 'linkClicked',
         "sourceUrl": document.location.href,

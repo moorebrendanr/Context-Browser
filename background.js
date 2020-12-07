@@ -32,8 +32,7 @@ let needsScreenshot = new Map();
 
 function printTree(tree) {
     if (tree == null) {
-        console.log('tree is null');
-        return;
+        return 'tree is null';
     }
     let result = '';
     function iterator(node) {
@@ -50,7 +49,7 @@ function printTree(tree) {
 }
 
 function onReceived(message, sender, sendResponse) {
-    let tabId;
+    let tabId = sender.tab.id;
     switch (message.id) {
         case 'enableDisable':
             enabled = !enabled;
@@ -66,14 +65,17 @@ function onReceived(message, sender, sendResponse) {
             }
             break;
         case 'getTreeForTab':
-            tabId = message.tabId;
-            if (!(tabId in trees))
+            let tabIdToGet = message.tabId;
+            if (!(tabIdToGet in trees))
                 sendResponse('Error: No tree found for this tab...');
             sendResponse(printTree(trees[tabId]));
             break;
         case 'iframeCreated':
             console.log(`Waiting for ${message.url} to load...`);
             needsScreenshot.set(message.url, message.boundingBox);
+            break;
+        case 'iframeClosed':
+            deleteIframe(tabId, message.windowId);
             break;
         default:
             console.log(`Unknown message id: ${message.id}`);
@@ -127,6 +129,17 @@ function initializeTree(tabId, url, imageUri) {
         imageUri ? { 'imageUri' : imageUri } : null);
     console.log(newNode);
     trees[tabId] = new Arboreal(null, newNode);
+}
+
+function deleteIframe(tabId, windowId) {
+    if (!(tabId in trees))
+        return;
+    let tree = trees[tabId];
+    console.log(`Deleting window ${windowId} from tab ${tabId}`);
+    tree.traverseDown(item => {
+        if (item.data.id === windowId)
+            item.remove();
+    });
 }
 
 function onError(error) { console.error(`Error: ${error}`); }
