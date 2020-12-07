@@ -44,26 +44,42 @@ async function getSavedContexts() {
     saves = storageResult.saves;
     contextsDiv.empty();
     for (const save of saves) {
+        var saveContainer = document.createElement('div');
+        saveContainer.className = 'saveContainer';
+
+        var screenshot = document.createElement('img');
+        screenshot.src = save.screenshot;
+        screenshot.className = 'saveScreenshot';
+        saveContainer.append(screenshot);
+
+        var p = document.createElement('p');
+        p.className = 'saveText';
         var favicon = document.createElement('img');
         favicon.src = save.faviconUrl;
-        favicon.width = 16;
-        favicon.height = 16;
-        var p = document.createElement('p');
+        favicon.className = 'saveFavicon';
         p.appendChild(favicon);
         p.appendChild(document.createTextNode(' '));
-        p.appendChild(document.createTextNode(`${save.url}`));
+        p.appendChild(document.createTextNode(save.url));
         p.appendChild(document.createElement('br'));
         p.appendChild(document.createTextNode(`Saved ${dateToString(save.date)}`));
         p.appendChild(document.createElement('br'));
-        p.appendChild(document.createTextNode(`${save.numNodes} pages`));
-        contextsDiv.append(p);
-        var screenshot = document.createElement('img');
-        screenshot.src = save.screenshot;
-        screenshot.style.maxWidth = '80%';
-        screenshot.style.maxHeight = '150px';
-        screenshot.style.width = 'auto';
-        screenshot.style.height = 'auto';
-        contextsDiv.append(screenshot);
+        if (save.numNodes == 1)
+            p.appendChild(document.createTextNode('1 page'));
+        else
+            p.appendChild(document.createTextNode(`${save.numNodes} pages`));
+        p.appendChild(document.createElement('br'));
+
+        var restoreButton = document.createElement('button');
+        restoreButton.textContent = 'Restore';
+        var deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete';
+
+        p.appendChild(restoreButton);
+        p.appendChild(document.createTextNode(' '));
+        p.appendChild(deleteButton);
+        saveContainer.append(p);
+
+        contextsDiv.append(saveContainer);
     }
 }
 
