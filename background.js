@@ -5,20 +5,20 @@ browser.runtime.onMessage.addListener(onReceived);
 let enabled = true;
 let windowId = 0;
 
-function initLocalStorage() {
-    browser.storage.local.get('enabled').then(data => {
+async function initLocalStorage() {
+    await browser.storage.local.get('enabled').then(data => {
         if ('enabled' in data)
             enabled = data['enabled'];
         else
             browser.storage.local.set({'enabled': enabled});
     });
-    browser.storage.local.get('windowId').then(data => {
+    await browser.storage.local.get('windowId').then(data => {
         if ('windowId' in data)
             windowId = data['windowId'];
         else
             browser.storage.local.set({'windowId': windowId});
     });
-    browser.storage.local.get('saves').then(data => {
+    await browser.storage.local.get('saves').then(data => {
         if (!('saves' in data))
             browser.storage.local.set({'saves': []});
     });
@@ -63,7 +63,8 @@ function onReceived(message, sender, sendResponse) {
     switch (message.id) {
         case 'clearLocalStorage':
             browser.storage.local.clear();
-            initLocalStorage();
+            initLocalStorage().then(() =>
+                browser.runtime.sendMessage({ 'id': 'popupRefresh' }));
             break;
         case 'enableDisable':
             enabled = !enabled;
@@ -93,9 +94,11 @@ function onReceived(message, sender, sendResponse) {
             break;
         case 'saveCurrentTab':
             browser.tabs.query({currentWindow: true, active: true}).then((tabs) => {
-                addSave(tabs[0]).then(() => sendResponse(null));
-                // send response when done so the popup knows to refresh the save list
+                addSave(tabs[0]).then(() => {
+                    browser.runtime.sendMessage({ 'id': 'popupRefresh' })
+                });
             });
+            // send response when done so the popup knows to refresh the save list
             break;
         default:
             console.log(`Unknown message id: ${message.id}`);
@@ -192,12 +195,11 @@ async function addSave(tab) {
         'screenshot': screenshot
     };
 
-    browser.storage.local.get('saves').then(data => {
-        let saves = data.saves;
-        saves.push(newSave);
-        browser.storage.local.set({'saves': saves});
-    });
-    console.log('save added');
+    let data = await browser.storage.local.get('saves');
+    let saves = data.saves;
+    saves.push(newSave);
+    await browser.storage.local.set({'saves': saves});
+    console.log('Save added');
 }
 
 function onError(error) { console.error(`Error: ${error}`); }

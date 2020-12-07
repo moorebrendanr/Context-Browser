@@ -1,13 +1,16 @@
 // For some reason specifying this CSS in the HTML as style='...' doesn't work...
-// Firefox imposes a limit of 800x600 so it won't grow beyond that.
+// Firefox imposes a limit of 800x600, but setting it to 800x600 shows
+//   scrollbars even if the content isn't that big, so make it a bit smaller.
 $('body').css({
-    'width': 1000,
-    'height': 1400
+    'width': 780,
+    'height': 580
 });
 
 const edb = $('#enableDisableButton');
-const saveButton = $('#saveButton');
 const contextsDiv = $('#contexts');
+
+$('#saveButton').click(() =>
+    browser.runtime.sendMessage({ 'id': 'saveCurrentTab' }));
 
 $('#clearLocalStorage').click(() =>
     browser.runtime.sendMessage({ 'id': 'clearLocalStorage' }));
@@ -34,11 +37,6 @@ function onError(error) { console.log(`Error: ${error}`); }
 
 const gettingCurrent = browser.tabs.query({active: true, lastFocusedWindow: true});
 gettingCurrent.then(onGot, onError);
-
-saveButton.click(() => {
-    browser.runtime.sendMessage({ 'id': 'saveCurrentTab' })
-        .then(getSavedContexts());
-});
 
 async function getSavedContexts() {
     var saves;
@@ -83,3 +81,14 @@ function dateToString(d) {
     if (min < 10) min = '0'+min;
     return y + '-' + m + '-' + day + ' @ ' + h + ':' + min;
 }
+
+function onReceived(message, sender, sendResponse) {
+    switch (message.id) {
+        case 'popupRefresh':
+            getSavedContexts();
+            break;
+        default:
+            console.log(`Unknown message id: ${message.id}`);
+    }
+}
+browser.runtime.onMessage.addListener(onReceived);
