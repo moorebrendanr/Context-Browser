@@ -47,7 +47,10 @@ async function getSavedContexts() {
         favicon.className = 'saveFavicon';
         p.appendChild(favicon);
         p.appendChild(document.createTextNode(' '));
+        p.appendChild(document.createTextNode(save.title));
+        p.appendChild(document.createElement('br'));
         p.appendChild(document.createTextNode(save.url));
+        p.appendChild(document.createElement('br'));
         p.appendChild(document.createElement('br'));
         p.appendChild(document.createTextNode(`Saved ${dateToString(save.date)}`));
         p.appendChild(document.createElement('br'));
@@ -56,7 +59,6 @@ async function getSavedContexts() {
         else
             p.appendChild(document.createTextNode(`${save.numNodes} pages`));
         p.appendChild(document.createElement('br'));
-        p.appendChild(document.createTextNode(`Id: ${save.id}`));
         p.appendChild(document.createElement('br'));
 
         var restoreButton = document.createElement('button');
@@ -74,6 +76,8 @@ async function getSavedContexts() {
         p.appendChild(restoreButton);
         p.appendChild(document.createTextNode(' '));
         p.appendChild(deleteButton);
+        //p.appendChild(document.createTextNode(' '));
+        //p.appendChild(document.createTextNode(`Id: ${save.id}`));
         saveContainer.append(p);
 
         contextsDiv.append(saveContainer);

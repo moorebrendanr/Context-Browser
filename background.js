@@ -200,6 +200,7 @@ async function addSave(tab) {
     let newSave = {
         'id': nanoid(),
         'url': tab.url,
+        'title': tab.title,
         'faviconUrl': tab.favIconUrl,
         'tree': tree,
         'date': new Date(),
