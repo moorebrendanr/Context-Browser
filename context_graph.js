@@ -44,6 +44,8 @@ async function getSavedContexts() {
     saves = storageResult.saves;
     contextsDiv.empty();
     for (const save of saves) {
+        let saveId = save.id;
+
         var saveContainer = document.createElement('div');
         saveContainer.className = 'saveContainer';
 
@@ -71,8 +73,15 @@ async function getSavedContexts() {
 
         var restoreButton = document.createElement('button');
         restoreButton.textContent = 'Restore';
+        restoreButton.addEventListener('click', () => {
+            browser.runtime.sendMessage({ 'id': 'restoreSave', 'saveId': saveId });
+        });
+
         var deleteButton = document.createElement('button');
         deleteButton.textContent = 'Delete';
+        deleteButton.addEventListener('click', () => {
+            browser.runtime.sendMessage({ 'id': 'deleteSave', 'saveId': saveId });
+        });
 
         p.appendChild(restoreButton);
         p.appendChild(document.createTextNode(' '));

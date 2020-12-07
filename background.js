@@ -98,8 +98,13 @@ function onReceived(message, sender, sendResponse) {
                     browser.runtime.sendMessage({ 'id': 'popupRefresh' })
                 });
             });
-            // send response when done so the popup knows to refresh the save list
             break;
+        case 'restoreSave':
+            restoreSave(message.saveId);
+        case 'deleteSave':
+            deleteSave(message.saveId).then(() => {
+                browser.runtime.sendMessage({ 'id': 'popupRefresh' })
+            });
         default:
             console.log(`Unknown message id: ${message.id}`);
     }
@@ -173,6 +178,11 @@ function getSaves() {
     });
 }
 
+async function deleteSave(id) {
+    let data = await browser.storage.local.get('saves');
+    browser.storage.local.set({'saves': data.saves.filter(save => save.id !== id)});
+}
+
 async function addSave(tab) {
     console.log(`adding save for tab ${tab.id}`);
     if (!(tab.id in trees))
@@ -200,6 +210,10 @@ async function addSave(tab) {
     saves.push(newSave);
     await browser.storage.local.set({'saves': saves});
     console.log('Save added');
+}
+
+function restoreSave(id) {
+    // TODO
 }
 
 function onError(error) { console.error(`Error: ${error}`); }
