@@ -161,8 +161,7 @@ function handleLinkClick(el) {
     }).then(r => {
         el.classList.add("userClicked" + r.windowId);
         createIframe(r);
-    }
-    );
+    });
 }
 
 function setResizable(el) {

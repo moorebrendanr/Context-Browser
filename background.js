@@ -141,7 +141,8 @@ function handleLinkClick(tab, sourceUrl, targetUrl) {
     let newWindowId = getNewWindowId();
     srcNode.appendChild({
         'url': targetUrl,
-        'id': newWindowId
+        'id': newWindowId,
+        'date': new Date()
     });
     return {
         'id': 'openIFrame',
@@ -156,6 +157,7 @@ function initializeTree(tabId, url, imageUri) {
     Object.assign(newNode,
         { 'url': url },
         { 'id': getNewWindowId() },
+        { 'date': new Date() },
         imageUri ? { 'imageUri' : imageUri } : null);
     console.log(newNode);
     trees[tabId] = new Arboreal(null, newNode);
