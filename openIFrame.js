@@ -143,7 +143,7 @@ function notifyLinkClicked(e) {
         if (el == null) break;
     }
     if (el != null && el.tagName === "A") {
-        browser.storage.local.get('enabled').then(function (data) {
+        browser.storage.local.get('enabled').then(data => {
             if (data['enabled'])
                 handleLinkClick(el)
         });

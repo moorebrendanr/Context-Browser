@@ -2,7 +2,12 @@ browser.runtime.onMessage.addListener(onReceived);
 
 let enabled = true;
 
-browser.storage.local.set({'enabled': enabled}).then(r => console.log(r));
+browser.storage.local.get('enabled').then(data => {
+    if ('enabled' in data)
+        enabled = data['enabled'];
+    else
+        browser.storage.local.set({'enabled': enabled});
+});
 
 const trees = {};
 
@@ -34,7 +39,7 @@ function onReceived(message, sender, sendResponse) {
     switch (message.id) {
         case 'enableDisable':
             enabled = !enabled;
-            browser.storage.local.set({'enabled': enabled}).then(r => console.log(r));
+            browser.storage.local.set({'enabled': enabled});
             break;
         case 'linkClicked':
             console.log(`Tab ${sender.tab.id} clicked link from ${message.sourceUrl} to ${message.targetUrl}`);
