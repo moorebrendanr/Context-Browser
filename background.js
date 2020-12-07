@@ -59,7 +59,11 @@ function onReceived(message, sender, sendResponse) {
         case 'linkClicked':
             console.log(`Tab ${sender.tab.id} clicked link from ${message.sourceUrl} to ${message.targetUrl}`);
             lastClickedLink = message.targetUrl;
-            handleLinkClick(sender.tab, message.sourceUrl, message.targetUrl);
+            let newWindowData = handleLinkClick(sender.tab, message.sourceUrl, message.targetUrl);
+            if (newWindowData !== null) {
+                console.log(`Asking tab ${sender.tab.id} to open ${message.targetUrl}`);
+                sendResponse(newWindowData);
+            }
             break;
         case 'getTreeForTab':
             tabId = message.tabId;
@@ -76,6 +80,8 @@ function onReceived(message, sender, sendResponse) {
     }
 }
 
+// check whether a new window should be created
+// returns either null or the data required for a new window
 function handleLinkClick(tab, sourceUrl, targetUrl) {
     let tree;
     if (!(tab.id in trees)) {
@@ -90,14 +96,14 @@ function handleLinkClick(tab, sourceUrl, targetUrl) {
     const srcNode = tree.find(function (node) { return node.data.url === sourceUrl; });
     if (srcNode == null) {
         console.log('Error: could not find source node for link click');
-        return;
+        return null;
     }
     console.log(`Current node:\n\turl: ${srcNode.data.url}\n\timage: ${srcNode.data.imageUri}`);
     // don't open duplicate child windows within a parent
     for (const node of srcNode.children) {
         if (node.data.url === targetUrl) {
             console.log('Not opening new child window since it already exists within this window.');
-            return;
+            return null;
         }
     }
     let newWindowId = getNewWindowId();
@@ -105,20 +111,16 @@ function handleLinkClick(tab, sourceUrl, targetUrl) {
         'url': targetUrl,
         'id': newWindowId
     });
-    console.log(`Asking tab ${tab.id} to open ${targetUrl}`);
-    browser.tabs.sendMessage(tab.id, {
+    return {
         'id': 'openIFrame',
         'windowId': newWindowId,
         'targetUrl': targetUrl,
         'upThumbnail': srcNode.data.imageUri
-    }).then(r => console.log(r));
-    console.log('New tree:');
-    console.log(printTree(tree));
+    };
 }
 
 function initializeTree(tabId, url, imageUri) {
     let newNode = {};
-    console.log('ghk');
     Object.assign(newNode,
         { 'url': url },
         { 'id': getNewWindowId() },

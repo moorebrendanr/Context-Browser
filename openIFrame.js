@@ -10,14 +10,8 @@ $("a")
 // and a minimizedId (the minimized button for that iframe)
 // {url: {containerId, minimizedId}}
 const iframes = new Map();
-let idModifier = 0;
 
 function onReceived(message, sender, sendResponse) {
-    if (message.id === 'openIFrame') {
-        sendResponse({});
-        console.log("Received image: "+message.upThumbnail);
-        createIframe(message);
-    }
 }
 
 /**
@@ -28,8 +22,8 @@ function createIframe(data) {
     let upThumbnail = data.upThumbail;
     let windowId = data.windowId;
 
-    console.log("Creating iframe");
-    let containerId = "linkPreviewContainer" + idModifier;
+    console.log("Creating iframe with id " + windowId);
+    let containerId = "linkPreviewContainer" + windowId;
 
     // Create the containing div
     let div = document.createElement("div");
@@ -52,7 +46,7 @@ function createIframe(data) {
 
     // Create the minimized button
     let minimized = document.createElement("button");
-    let minimizedId = "minimized" + idModifier;
+    let minimizedId = "minimized" + windowId;
     minimized.id = minimizedId;
     minimized.type = "button";
     minimized.innerHTML = "+";
@@ -62,7 +56,7 @@ function createIframe(data) {
         this.style.display = "none";
         div.style.display = "block";
     };
-    let element = $(`.userClicked${idModifier}`)[0];
+    let element = $(`.userClicked${windowId}`)[0];
     insertAfter(minimized, element);
 
     // create the close button
@@ -129,7 +123,6 @@ function createIframe(data) {
 
     dragElement(div);
     setResizable(div);
-    idModifier++;
     notifyIframeCreated(url, iframe.getBoundingClientRect())
 }
 
@@ -158,12 +151,15 @@ function notifyLinkClicked(e) {
 function handleLinkClick(el) {
     console.log('Link clicked');
     // give the element a unique class to find it later
-    el.classList.add("userClicked" + idModifier);
     browser.runtime.sendMessage({
         "id": 'linkClicked',
         "sourceUrl": document.location.href,
         "targetUrl": el.href
-    }).then(r => console.log(r));
+    }).then(r => {
+        el.classList.add("userClicked" + r.windowId);
+        createIframe(r);
+    }
+    );
 }
 
 function setResizable(el) {
