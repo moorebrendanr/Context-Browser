@@ -39,7 +39,7 @@
   ],
 
   "background": {
-    "scripts": ["arboreal.js", "background.js"]
+    "scripts": ["nanoid.js", "arboreal.js", "background.js"]
   },
   
   "browser_action": {

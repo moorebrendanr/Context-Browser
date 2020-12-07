@@ -1,3 +1,5 @@
+console.log(nanoid());
+
 browser.runtime.onMessage.addListener(onReceived);
 
 let enabled = true;
@@ -15,6 +17,11 @@ browser.storage.local.get('windowId').then(data => {
         windowId = data['windowId'];
     else
         browser.storage.local.set({'windowId': windowId});
+});
+
+browser.storage.local.get('saves').then(data => {
+    if (!('saves' in data))
+        browser.storage.local.set({'saves': []});
 });
 
 function getNewWindowId() {
@@ -49,7 +56,9 @@ function printTree(tree) {
 }
 
 function onReceived(message, sender, sendResponse) {
-    let tabId = sender.tab.id;
+    let tabId;
+    if ('tab' in sender)
+        tabId = sender.tab.id;
     switch (message.id) {
         case 'enableDisable':
             enabled = !enabled;
@@ -76,6 +85,12 @@ function onReceived(message, sender, sendResponse) {
             break;
         case 'iframeClosed':
             deleteIframe(tabId, message.windowId);
+            break;
+        case 'saveCurrentTab':
+            browser.tabs.query({currentWindow: true, active: true}).then((tabs) => {
+                addSave(tabs[0]);
+                sendResponse(null); // so the popup knows to refresh the save list
+            });
             break;
         default:
             console.log(`Unknown message id: ${message.id}`);
@@ -137,9 +152,38 @@ function deleteIframe(tabId, windowId) {
     let tree = trees[tabId];
     console.log(`Deleting window ${windowId} from tab ${tabId}`);
     tree.traverseDown(item => {
-        if (item.data.id === windowId)
+        if (item.data.id === windowId) {
             item.remove();
+            return false;
+        }
     });
+}
+
+function getSaves() {
+    browser.storage.local.get('saves').then(data => {
+        return data.saves;
+    });
+}
+
+function addSave(tab) {
+    console.log(`adding save for tab ${tab.id}`);
+    if (!(tab.id in trees))
+        return;
+
+    let newSave = {
+        'id': nanoid(),
+        'url': tab.url,
+        'faviconUrl': tab.favIconUrl,
+        'tree': trees[tab.id],
+        'date': new Date()
+    };
+
+    browser.storage.local.get('saves').then(data => {
+        let saves = data.saves;
+        saves.push(newSave);
+        browser.storage.local.set({'saves': saves});
+    });
+    console.log('save added');
 }
 
 function onError(error) { console.error(`Error: ${error}`); }
