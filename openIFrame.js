@@ -29,6 +29,20 @@ function createIframe(data) {
     let div = document.createElement("div");
     div.id = containerId;
     div.classList.add("linkPreviewContainer");
+    div.onclick = function() {
+        // Bring selected element to front
+        $(".linkPreviewContainer").each(function(index, element) {
+            if (element.isSameNode(div)) {
+                $(element).css({
+                    "z-index": 1000005
+                });
+            } else {
+                $(element).css({
+                    "z-index": 1000000
+                });
+            }
+        });
+    };
 
     // create the iframe
     let iframe = document.createElement("iframe");
@@ -145,9 +159,7 @@ function notifyLinkClicked(e) {
         if (el == null) break;
     }
     // don't trigger on JS action hrefs, such as javascript:void(0)
-    if (el.href.startsWith('javascript:'))
-        return;
-    if (el != null && el.tagName === "A") {
+    if (el != null && !el.href.startsWith('javascript:') && el.tagName === "A") {
         browser.storage.local.get('enabled').then(data => {
             if (data['enabled'])
                 handleLinkClick(el)

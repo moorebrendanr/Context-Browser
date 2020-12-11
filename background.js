@@ -141,7 +141,7 @@ function handleLinkClick(tab, message) {
         }
     }
     let newWindowId = getNewWindowId();
-    openingData = {
+    let openingData = {
         'id': 'openIFrame',
         'windowId': newWindowId,
         'targetUrl': targetUrl,
