@@ -22,10 +22,6 @@ function createIframe(data) {
     let upThumbnail = data.upThumbnail;
     let windowId = data.windowId;
 
-    getAvgColor(getFaviconURL(url)).then(avgColor => {
-        console.log(JSON.parse(JSON.stringify(avgColor)));
-    });
-
     console.log("Creating iframe with id " + windowId);
     let containerId = "linkPreviewContainer" + windowId;
 
@@ -47,6 +43,11 @@ function createIframe(data) {
             }
         });
     };
+
+    getAvgColor(getFaviconURL(url)).then(avgColor => {
+        console.log(JSON.parse(JSON.stringify(avgColor)));
+        div.style.borderColor = `rgb(${avgColor.r}, ${avgColor.g}, ${avgColor.b})`;
+    });
 
     // create the iframe
     let iframe = document.createElement("iframe");
