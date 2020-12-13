@@ -107,6 +107,8 @@ function onReceived(message, sender, sendResponse) {
                 browser.runtime.sendMessage({ 'id': 'popupRefresh' })
             });
             break;
+        case 'search':
+            search(message.params).then(saves => sendResponse(saves));
         default:
             console.log(`Unknown message id: ${message.id}`);
     }
@@ -234,6 +236,39 @@ async function restoreSave(id) {
         trees[tab.id] = save.tree;
     });
 }
+
+async function search(params) {
+    let targetColor = params.color;
+    let colorDiff = params.colorDiff;
+    let oldestCreateTime = params.oldestCreateTime;
+    let newestCreateTime = params.newestCreateTime;
+    let oldestModifyTime = params.oldestModifyTime;
+    let newestModifyTime = params.newestModifyTime;
+    let data = await browser.storage.local.get('saves');
+    let saves = data.saves;
+    // TODO: filter down saves to just the saves which match the criteria
+    return saves;
+}
+
+// usage example
+// from the content/popup script you would do:
+// browser.runtime.sendMessage({
+//   'id': 'search',
+//   'params': {} // the dict shown below
+// }).then(saves => {
+//   ... - take a look at content_graph.js/html/css at getSavedContexts for an example on how to render the saves and restore the save when clicked
+// });
+let yesterdayNight = new Date(); // today
+yesterdayNight.setDate(yesterdayNight.getDate() - 1);
+yesterdayNight.setHours(23, 59, 59, 999); // 23:59:59.999 ms
+search({
+    targetColor: [200, 140, 255], // rgb
+    colorDiff: 50, // on each r/g/b component
+    oldestCreateTime: new Date(1995, 11, 17), // month is 0-indexed
+    newestCreateTime: yesterdayNight,
+    oldestModifyTime: null, // don't filter on this if null
+    newestModifyTime: null
+}).then(saves => console.log(saves));
 
 function onError(error) { console.error(`Error: ${error}`); }
 
