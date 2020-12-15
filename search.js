@@ -11,7 +11,7 @@ const parameterSettings = {
 // Persists the values, even when they are toggled off.
 const inputValues = {
     targetColor: [0, 0, 0],
-    colorDiff: null,
+    colorDiff: 127,
     oldestCreateTime: null,
     newestCreateTime: null,
     oldestModifyTime: null,
@@ -30,7 +30,8 @@ checkboxes.oldestCreateTime.addEventListener('change', () => toggleParameter("ol
 checkboxes.newestCreateTime.addEventListener('change', () => toggleParameter("newestCreateTime"));
 checkboxes.oldestModifyTime.addEventListener('change', () => toggleParameter("oldestModifyTime"));
 checkboxes.newestModifyTime.addEventListener('change', () => toggleParameter("newestModifyTime"));
-checkboxes.targetColor.addEventListener('input', () => toggleParameter("targetColor"));
+checkboxes.targetColor.addEventListener('change', () => toggleParameter("targetColor", "colorDiff"));
+// checkboxes.targetColor.addEventListener('change', () => toggleParameter("colorDiff"));
 
 // Data and time inputs
 const oldestCreateDayInput = document.getElementById("createdAfterDate");
@@ -64,6 +65,15 @@ colorInput.addEventListener('change', event => {
     inputValues.targetColor = color;
     if (checkboxes.targetColor.checked) {
         parameterSettings.targetColor = inputValues.targetColor;
+    }
+    console.log(JSON.parse(JSON.stringify(parameterSettings)));
+})
+
+document.getElementById("colorSlider").addEventListener('change', event => {
+    let value = event.target.valueAsNumber;
+    inputValues.colorDiff = value;
+    if (checkboxes.targetColor.checked) {
+        parameterSettings.colorDiff = inputValues.colorDiff;
     }
     console.log(JSON.parse(JSON.stringify(parameterSettings)));
 })
@@ -112,13 +122,19 @@ function setHours(event, property) {
     console.log(JSON.parse(JSON.stringify(parameterSettings)));
 }
 
-function toggleParameter(property) {
+function toggleParameter(property, ...also) {
     if (checkboxes[property].checked) {
         if (inputValues[property]) {
             parameterSettings[property] = inputValues[property];
+            for (let alsoProperty of also) {
+                parameterSettings[alsoProperty] = inputValues[alsoProperty];
+            }
         }
     } else {
         parameterSettings[property] = null;
+        for (let alsoProperty of also) {
+            parameterSettings[alsoProperty] = null;
+        }
     }
     console.log(JSON.parse(JSON.stringify(parameterSettings)));
 }
@@ -128,7 +144,9 @@ function search() {
         id: "search",
         params: parameterSettings
     }).then(saves => {
-        // TODO
         console.log(saves);
+        if (saves) {
+            // TODO
+        }
     });
 }
