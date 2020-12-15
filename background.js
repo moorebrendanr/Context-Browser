@@ -109,6 +109,7 @@ function onReceived(message, sender, sendResponse) {
             break;
         case 'search':
             search(message.params).then(saves => sendResponse(saves));
+            break;
         default:
             console.log(`Unknown message id: ${message.id}`);
     }
