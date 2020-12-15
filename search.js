@@ -146,7 +146,59 @@ function search() {
     }).then(saves => {
         console.log("Retrieved saves: "+ saves);
         if (saves) {
-            // TODO
+            populateResults(saves);
         }
     });
+}
+
+function populateResults(saves) {
+    const resultsDiv = document.getElementById("searchResults");
+    $(resultsDiv).empty();
+    // TODO: This code is duplicated from context_graph.js, but I don't know a better solution in
+    //       JavaScript at the moment. Should abstract this logic somehow.
+    for (const save of saves) {
+        let saveId = save.id;
+
+        const saveContainer = document.createElement('div');
+        saveContainer.className = 'saveContainer';
+
+        const screenshot = document.createElement('img');
+        screenshot.src = save.screenshot;
+        screenshot.className = 'saveScreenshot';
+        saveContainer.append(screenshot);
+
+        const p = document.createElement('p');
+        p.className = 'saveText';
+        const favicon = document.createElement('img');
+        favicon.src = save.faviconUrl;
+        favicon.className = 'saveFavicon';
+        p.appendChild(favicon);
+        p.appendChild(document.createTextNode(' '));
+        p.appendChild(document.createTextNode(save.title));
+        p.appendChild(document.createElement('br'));
+        p.appendChild(document.createTextNode(save.url));
+        p.appendChild(document.createElement('br'));
+        p.appendChild(document.createElement('br'));
+        p.appendChild(document.createTextNode(`Saved ${save.date.toDateString()}`));
+        p.appendChild(document.createElement('br'));
+        if (save.numNodes === 1)
+            p.appendChild(document.createTextNode('1 page'));
+        else
+            p.appendChild(document.createTextNode(`${save.numNodes} pages`));
+        p.appendChild(document.createElement('br'));
+        p.appendChild(document.createElement('br'));
+
+        const restoreButton = document.createElement('button');
+        restoreButton.textContent = 'Restore';
+        restoreButton.addEventListener('click', () => {
+            browser.runtime.sendMessage({ 'id': 'restoreSave', 'saveId': saveId });
+        });
+
+        p.appendChild(restoreButton);
+        p.appendChild(document.createTextNode(' '));
+
+        saveContainer.appendChild(p);
+
+        resultsDiv.appendChild(saveContainer);
+    }
 }
