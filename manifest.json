@@ -48,5 +48,11 @@
     "default_popup": "context_graph.html"
   },
 
+  "sidebar_action": {
+    "default_title": "Context Search",
+    "default_icon": "icons/icon-32.png",
+    "default_panel": "sidebar.html"
+  },
+
   "web_accessible_resources": ["icons/*"]
 }
