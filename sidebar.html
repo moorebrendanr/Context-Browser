@@ -3,8 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <title>Search Contexts</title>
+    <link rel="stylesheet" href="sidebar.css">
 </head>
 <body>
-
+    <div id="searchOptions">
+        <div id="created" class="searchOption">
+            <div>First visited:</div>
+            <div id="createdAfter">
+                <input id="createdAfterCheckbox" type="checkbox" name="createdAfter">
+                <label for="createdAfter">After:</label>
+                <div>
+                    <input id="createdAfterDate" type="date" name="createdAfterDate">
+                    <input id="createdAfterTime" type="time" name="createdAfterTime">
+                </div>
+            </div>
+            <div id="createdBefore">
+                <input id="createdBeforeCheckbox" type="checkbox" name="createdBefore">
+                <label for="createdBefore">Before:</label>
+                <div>
+                    <input id="createdBeforeDate" type="date" name="createdBeforeDate">
+                    <input id="createdBeforeTime" type="time" name="createdBeforeTime">
+                </div>
+            </div>
+        </div>
+        <div id="modified" class="searchOption">
+            <div>Last visited:</div>
+            <div id="modifiedAfter">
+                <input id="modifiedAfterCheckbox" type="checkbox" name="modifiedAfter">
+                <label for="modifiedAfter">After:</label>
+                <div>
+                    <input id="modifiedAfterDate" type="date" name="modifiedAfterDate">
+                    <input id="modifiedAfterTime" type="time" name="modifiedAfterTime">
+                </div>
+            </div>
+            <div id="modifiedBefore">
+                <input id="modifiedBeforeCheckbox" type="checkbox" name="modifiedBefore">
+                <label for="modifiedBefore">Before:</label>
+                <div>
+                    <input id="modifiedBeforeDate" type="date" name="modifiedBeforeDate">
+                    <input id="modifiedBeforeTime" type="time" name="modifiedBeforeTime">
+                </div>
+            </div>
+        </div>
+        <div id="color" class="searchOption">
+            <input id="colorCheckbox" type="checkbox" name="color">
+            <label for="color">Color</label>
+            <input id="colorPicker" type="color" name="colorPicker">
+        </div>
+    </div>
+    <div id="searchButtonContainer">
+        <button id="searchButton">Search</button>
+    </div>
+    <div id="searchResults"></div>
+    <script src="search.js"></script>
 </body>
 </html>

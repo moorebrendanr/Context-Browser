@@ -1,0 +1,18 @@
+.searchOption {
+    border-bottom: 1px solid black;
+    padding: 4px;
+}
+
+#searchButton {
+    display: block;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+div {
+    margin: 5px 0 5px 0;
+}
+
+body {
+    border: 1px solid black;
+}
