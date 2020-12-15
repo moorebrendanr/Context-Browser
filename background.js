@@ -108,8 +108,9 @@ function onReceived(message, sender, sendResponse) {
             });
             break;
         case 'search':
-            search(message.params).then(saves => sendResponse(saves));
-            break;
+            return new Promise(resolve => {
+                search(message.params).then(saves => resolve(saves));
+            })
         default:
             console.log(`Unknown message id: ${message.id}`);
     }
@@ -259,17 +260,17 @@ async function search(params) {
 // }).then(saves => {
 //   ... - take a look at content_graph.js/html/css at getSavedContexts for an example on how to render the saves and restore the save when clicked
 // });
-let yesterdayNight = new Date(); // today
-yesterdayNight.setDate(yesterdayNight.getDate() - 1);
-yesterdayNight.setHours(23, 59, 59, 999); // 23:59:59.999 ms
-search({
-    targetColor: [200, 140, 255], // rgb
-    colorDiff: 50, // on each r/g/b component
-    oldestCreateTime: new Date(1995, 11, 17), // month is 0-indexed
-    newestCreateTime: yesterdayNight,
-    oldestModifyTime: null, // don't filter on this if null
-    newestModifyTime: null
-}).then(saves => console.log(saves));
+// let yesterdayNight = new Date(); // today
+// yesterdayNight.setDate(yesterdayNight.getDate() - 1);
+// yesterdayNight.setHours(23, 59, 59, 999); // 23:59:59.999 ms
+// search({
+//     targetColor: [200, 140, 255], // rgb
+//     colorDiff: 50, // on each r/g/b component
+//     oldestCreateTime: new Date(1995, 11, 17), // month is 0-indexed
+//     newestCreateTime: yesterdayNight,
+//     oldestModifyTime: null, // don't filter on this if null
+//     newestModifyTime: null
+// }).then(saves => console.log(saves));
 
 function onError(error) { console.error(`Error: ${error}`); }
 

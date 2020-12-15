@@ -144,7 +144,7 @@ function search() {
         id: "search",
         params: parameterSettings
     }).then(saves => {
-        console.log(saves);
+        console.log("Retrieved saves: "+ saves);
         if (saves) {
             // TODO
         }
