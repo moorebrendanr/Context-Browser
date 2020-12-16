@@ -208,3 +208,16 @@ function populateResults(saves) {
         resultsDiv.appendChild(saveContainer);
     }
 }
+
+function dateToString(d) {
+    var y = d.getFullYear();
+    var m = d.getMonth() + 1;
+    if (m < 10) m = '0'+m;
+    var day = d.getDate();
+    if (day < 10) day = '0'+day;
+    var h = d.getHours();
+    if (h < 10) h = '0'+h;
+    var min = d.getMinutes();
+    if (min < 10) min = '0'+min;
+    return y + '-' + m + '-' + day + ' @ ' + h + ':' + min;
+}
