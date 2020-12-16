@@ -15,5 +15,16 @@ div {
 
 body {
     border: 1px solid black;
+    width: auto;
+    height: auto;
 }
 
+.saveContainer {
+    display: flow;
+    border-bottom: 1px solid black;
+    padding-bottom: 5px;
+}
+
+#searchResults {
+    padding: 5px;
+}

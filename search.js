@@ -165,7 +165,7 @@ function populateResults(saves) {
         const screenshot = document.createElement('img');
         screenshot.src = save.screenshot;
         screenshot.className = 'saveScreenshot';
-        saveContainer.append(screenshot);
+        saveContainer.appendChild(screenshot);
 
         const p = document.createElement('p');
         p.className = 'saveText';
@@ -179,7 +179,7 @@ function populateResults(saves) {
         p.appendChild(document.createTextNode(save.url));
         p.appendChild(document.createElement('br'));
         p.appendChild(document.createElement('br'));
-        p.appendChild(document.createTextNode(`Saved ${save.date.toDateString()}`));
+        p.appendChild(document.createTextNode(`Saved ${save.date.toString()}`));
         p.appendChild(document.createElement('br'));
         if (save.numNodes === 1)
             p.appendChild(document.createTextNode('1 page'));
