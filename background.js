@@ -174,7 +174,6 @@ function initializeTree(tabId, url, imageUri) {
         { 'date': new Date() },
         imageUri ? { 'imageUri' : imageUri } : null,
         { 'openingData': null });
-    console.log(newNode);
     trees[tabId] = new Arboreal(null, newNode);
 }
 
@@ -303,7 +302,7 @@ async function search(params) {
 function onError(error) { console.error(`Error: ${error}`); }
 
 function webRequestHandler(requestDetails) {
-    console.log(`Requested url: ${requestDetails.url}`);
+    //console.log(`Requested url: ${requestDetails.url}`);
     if (lastClickedLink === requestDetails.url) {
         lastClickedLink = null;
         console.log("Cancelling request.");
