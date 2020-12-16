@@ -92,44 +92,46 @@ function insertIframe(data, doc, children, restoring) {
     let element = elements[0];
 
     // Create the minimized button
-    // delete any existing minized button, in case this link was opened and then closed and now opened again
-    for (let i = 0; i < element.parentNode.childNodes.length; ++i) {
-        if (element.parentNode.childNodes[i].id
-            && element.parentNode.childNodes[i].id.startsWith('minimized'))
-            element.parentNode.childNodes[i].remove();
-    }
-    let minimized = doc.createElement("button");
-    let minimizedId = "minimized" + windowId;
-    minimized.id = minimizedId;
-    minimized.type = "button";
-    minimized.innerHTML = "+";
-    minimized.style.display = "none";
-    minimized.style.backgroundColor = "red";
-    minimized.onclick = function () {
-        this.style.display = "none";
-        div.style.display = "block";
-    };
-    if (!restoring)
+    if (!restoring) {
+        // delete any existing minized button, in case this link was opened and then closed and now opened again
+        for (let i = 0; i < element.parentNode.childNodes.length; ++i) {
+            if (element.parentNode.childNodes[i].id
+                && element.parentNode.childNodes[i].id.startsWith('minimized'))
+                element.parentNode.childNodes[i].remove();
+        }
+        let minimized = doc.createElement("button");
+        let minimizedId = "minimized" + windowId;
+        minimized.id = minimizedId;
+        minimized.type = "button";
+        minimized.innerHTML = "+";
+        minimized.style.display = "none";
+        minimized.style.backgroundColor = "red";
+        minimized.onclick = function () {
+            this.style.display = "none";
+            div.style.display = "block";
+        };
         insertAfter(minimized, element);
+    }
 
     // Create the closed button
-    // delete any existing closed button
-    for (let i = 0; i < element.parentNode.childNodes.length; ++i) {
-        if (element.parentNode.childNodes[i].id
-            && element.parentNode.childNodes[i].id.startsWith('closed'))
-            element.parentNode.childNodes[i].remove();
-    }
-    let closed = doc.createElement("button");
-    closed.id = "closed" + windowId;
-    closed.type = "button";
-    closed.disabled = true;
-    closed.innerHTML = "x";
-    closed.style.display = "none";
-    closed.style.border = "1px solid black";
-    closed.style.backgroundColor = "lightgray";
-    closed.style.color = "black";
-    if (!restoring)
+    if (!restoring) {
+        // delete any existing closed button
+        for (let i = 0; i < element.parentNode.childNodes.length; ++i) {
+            if (element.parentNode.childNodes[i].id
+                && element.parentNode.childNodes[i].id.startsWith('closed'))
+                element.parentNode.childNodes[i].remove();
+        }
+        let closed = doc.createElement("button");
+        closed.id = "closed" + windowId;
+        closed.type = "button";
+        closed.disabled = true;
+        closed.innerHTML = "x";
+        closed.style.display = "none";
+        closed.style.border = "1px solid black";
+        closed.style.backgroundColor = "lightgray";
+        closed.style.color = "black";
         insertAfter(closed, element);
+    }
 
     // create the close button
     let btnClose = doc.createElement("button");
