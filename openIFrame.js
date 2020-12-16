@@ -12,12 +12,22 @@ $("a")
 const iframes = new Map();
 
 function onReceived(message, sender, sendResponse) {
+    if (message.id == 'restore') {
+        let tree = message.tree;
+        let childNodes = tree.children;
+        console.log(childNodes);
+        for (let i = 0; i < childNodes.length; i++) {
+            let childNode = childNodes[i];
+            console.log(`restoring iframe for ${childNode.data.openingData.targetUrl}`)
+            insertIframe(childNode.data.openingData, document, childNode.children, true);
+        };
+    }
 }
 
 /**
  * Create a PiP view associated with a certain link element on the page.
  */
-function insertIframe(data, doc) {
+function insertIframe(data, doc, children, restoring) {
     let url = data.targetUrl;
     let upThumbnail = data.upThumbnail;
     let windowId = data.windowId;
@@ -55,7 +65,15 @@ function insertIframe(data, doc) {
     iframe.src = url;
     iframe.classList.add("linkPreviewIframe");
     iframe.onload = () => {
-        console.log(iframe.contentDocument);
+        if (!restoring || children == null)
+            return;
+        for (let i = 0; i < children.length; i++) {
+            let childNode = children[i];
+            insertIframe(childNode.data.openingData,
+                iframe.contentDocument,
+                childNode.children,
+                true);
+        }
     };
 
     // create the header bar
@@ -79,7 +97,8 @@ function insertIframe(data, doc) {
         div.style.display = "block";
     };
     let element = $(`.userClicked${windowId}`)[0];
-    insertAfter(minimized, element);
+    if (!restoring)
+        insertAfter(minimized, element);
 
     // create the close button
     let btnClose = doc.createElement("button");
@@ -184,7 +203,7 @@ function handleLinkClick(el) {
         'linkText': el.textContent
     }).then(r => {
         el.classList.add("userClicked" + r.windowId);
-        insertIframe(r, document);
+        insertIframe(r, document, null, false);
     });
 }
 

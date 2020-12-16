@@ -168,7 +168,8 @@ function initializeTree(tabId, url, imageUri) {
         { 'url': url },
         { 'id': getNewWindowId() },
         { 'date': new Date() },
-        imageUri ? { 'imageUri' : imageUri } : null);
+        imageUri ? { 'imageUri' : imageUri } : null,
+        { 'openingData': null });
     console.log(newNode);
     trees[tabId] = new Arboreal(null, newNode);
 }
@@ -236,6 +237,12 @@ async function restoreSave(id) {
         'url': save.url
     }).then(tab => {
         trees[tab.id] = save.tree;
+        setTimeout(() => {
+            browser.tabs.sendMessage(tab.id, {
+                'id': 'restore',
+                'tree': save.tree
+            });
+        }, 4000);
     });
 }
 
