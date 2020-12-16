@@ -27,6 +27,7 @@
       "js": [
           "jquery/jquery-3.5.1.min.js",
           "jquery/jquery-ui.min.js",
+          "imageColor.js",
           "openIFrame.js"
       ],
       "css": [
@@ -39,7 +40,7 @@
   ],
 
   "background": {
-    "scripts": ["nanoid.js", "arboreal.js", "background.js"]
+    "scripts": ["nanoid.js", "arboreal.js", "imageColor.js", "background.js"]
   },
 
   "browser_action": {
