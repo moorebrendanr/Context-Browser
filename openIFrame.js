@@ -102,6 +102,7 @@ function insertIframe(data, doc, children, restoring, nodeNum) {
     let element = elements[0];
 
     // Create the minimized button
+    let minimizedId;
     if (!restoring) {
         // delete any existing minized button, in case this link was opened and then closed and now opened again
         for (let i = 0; i < element.parentNode.childNodes.length; ++i) {
@@ -110,7 +111,7 @@ function insertIframe(data, doc, children, restoring, nodeNum) {
                 element.parentNode.childNodes[i].remove();
         }
         let minimized = doc.createElement("button");
-        let minimizedId = "minimized" + windowId;
+        minimizedId = "minimized" + windowId;
         minimized.id = minimizedId;
         minimized.type = "button";
         minimized.innerHTML = "+";
