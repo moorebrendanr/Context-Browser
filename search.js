@@ -2,6 +2,8 @@
 const parameterSettings = {
     targetColor: null, // rgb
     colorDiff: null, // on each r/g/b component
+    targetFaviconColor: null, // rgb
+    faviconColorDiff: null, // on each r/g/b component
     oldestCreateTime: null, // month is 0-indexed
     newestCreateTime: null,
     oldestModifyTime: null, // don't filter on this if null

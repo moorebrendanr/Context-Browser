@@ -277,8 +277,10 @@ browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 });
 
 async function search(params) {
-    let targetColor = params.color;
+    let targetColor = params.targetColor;
     let colorDiff = params.colorDiff;
+    let targetFaviconColor = params.targetFaviconColor;
+    let faviconColorDiff = params.faviconColorDiff;
     let oldestCreateTime = params.oldestCreateTime;
     let newestCreateTime = params.newestCreateTime;
     let oldestModifyTime = params.oldestModifyTime;
