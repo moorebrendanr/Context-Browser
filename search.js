@@ -85,7 +85,7 @@ document.getElementById("searchButton").onclick = search;
 function setDate(event, property) {
     let day;
     if (event.target.value) {
-        day = new Date(event.target.value);
+        day = new Date(event.target.value + " 23:59:59.999");
     } else {
         day = new Date();
     }
@@ -107,9 +107,9 @@ function setHours(event, property) {
     if (event.target.value) {
         hours = event.target.value.split(':');
     } else {
-        hours = [0, 0];
+        hours = [23, 59];
     }
-    // const hours = event.target.value.split(':');
+
     if (inputValues[property]) {
         inputValues[property].setHours(hours[0], hours[1]);
     } else {
@@ -146,7 +146,8 @@ function search() {
         id: "search",
         params: parameterSettings
     }).then(saves => {
-        console.log("Retrieved saves: "+ saves);
+        console.log("Retrieved saves:");
+        console.log(saves);
         if (saves) {
             populateResults(saves);
         }

@@ -277,6 +277,8 @@ browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 });
 
 async function search(params) {
+    console.log('Searching');
+    console.log(params);
     let targetColor = params.targetColor;
     let colorDiff = params.colorDiff;
     let targetFaviconColor = params.targetFaviconColor;
@@ -285,10 +287,51 @@ async function search(params) {
     let newestCreateTime = params.newestCreateTime;
     let oldestModifyTime = params.oldestModifyTime;
     let newestModifyTime = params.newestModifyTime;
-    let data = await browser.storage.local.get('saves');
-    let saves = data.saves;
-    // TODO: filter down saves to just the saves which match the criteria
-    return saves;
+    let savesData = await browser.storage.local.get('saves');
+    let saves = savesData.saves;
+
+    let matchFunc = (node, save) => {
+        if (oldestCreateTime != null && save.createdDate < oldestCreateTime)
+            return false;
+        if (newestCreateTime != null && save.createdDate > newestCreateTime)
+            return false;
+        if (oldestModifyTime != null && save.updateDate < oldestModifyTime)
+            return false;
+        if (newestModifyTime != null && save.updateDate > newestModifyTime)
+            return false;
+        let data = node.data;
+        if (targetColor != null && colorDiff != null) {
+            let pageColor = data.pageColor;
+            let pageRmin = targetColor.r - colorDiff;
+            let pageGmin = targetColor.g - colorDiff;
+            let pageBmin = targetColor.b - colorDiff;
+            let pageRmax = targetColor.r + colorDiff;
+            let pageGmax = targetColor.g + colorDiff;
+            let pageBmax = targetColor.b + colorDiff;
+            if (pageColor.r < pageRmin || pageColor.r > pageRmax)
+                return false;
+            if (pageColor.g < pageGmin || pageColor.g > pageGmax)
+                return false;
+            if (pageColor.b < pageBmin || pageColor.b > pageBmax)
+                return false;
+        }
+        return true;
+    };
+
+    let matchedSaves = [];
+
+    for (const saveNum in saves) {
+        const save = saves[saveNum];
+        const tree = save.tree;
+        // for some reason these need to be added back in
+        tree.find = new Arboreal().find;
+        tree.traverseDown = new Arboreal().traverseDown;
+        const matchingNode = tree.find(node => matchFunc(node, save));
+        if (matchingNode != null)
+            matchedSaves.push(save);
+    }
+
+    return matchedSaves;
 }
 
 // usage example
