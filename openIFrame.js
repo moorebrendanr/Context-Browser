@@ -55,8 +55,12 @@ function insertIframe(data, doc, children, restoring) {
     };
 
     getAvgColor(getFaviconURL(url)).then(avgColor => {
-        console.log(JSON.parse(JSON.stringify(avgColor)));
         div.style.borderColor = `rgb(${avgColor.r}, ${avgColor.g}, ${avgColor.b})`;
+        browser.runtime.sendMessage({
+            id: 'setFaviconColor',
+            windowId: windowId,
+            color: avgColor
+        });
     });
 
     // create the iframe

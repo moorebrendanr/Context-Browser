@@ -93,6 +93,9 @@ function onReceived(message, sender, sendResponse) {
         case 'iframeClosed':
             deleteIframe(tabId, message.windowId);
             break;
+        case 'setFaviconColor':
+            setFaviconColor(message.windowId, message.color);
+            break;
         case 'saveCurrentTab':
             browser.tabs.query({currentWindow: true, active: true}).then((tabs) => {
                 addSave(tabs[0]).then(() => {
@@ -186,6 +189,18 @@ function deleteIframe(tabId, windowId) {
             return false;
         }
     });
+}
+
+function setFaviconColor(windowId, color) {
+    console.log(`Setting window ${windowId} to ${color}`);
+    for (const tabId in trees) {
+        trees[tabId].traverseDown(item => {
+            if (item.data.id === windowId) {
+                item.data.color = color;
+                return false;
+            }
+        });
+    }
 }
 
 function getSaves() {
