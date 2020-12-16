@@ -294,6 +294,7 @@ browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 async function search(params) {
     console.log('Searching');
     console.log(params);
+    let title = params.title;
     let targetColor = params.targetColor;
     let colorDiff = params.colorDiff;
     let targetFaviconColor = params.targetFaviconColor;
@@ -306,6 +307,9 @@ async function search(params) {
     let saves = savesData.saves;
 
     let matchFunc = (node, save) => {
+        let data = node.data;
+        if (title != null && !data.title.toUpperCase().includes(title.toUpperCase()))
+            return false;
         if (oldestCreateTime != null && save.createdDate < oldestCreateTime)
             return false;
         if (newestCreateTime != null && save.createdDate > newestCreateTime)
@@ -314,7 +318,6 @@ async function search(params) {
             return false;
         if (newestModifyTime != null && save.updateDate > newestModifyTime)
             return false;
-        let data = node.data;
         if (targetColor != null && colorDiff != null) {
             let targetR = targetColor[0];
             let targetG = targetColor[1];

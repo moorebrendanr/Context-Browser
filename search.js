@@ -1,5 +1,6 @@
 // Keeps an updated list of search parameters. If a parameter is toggled off, then it is set to null.
 const parameterSettings = {
+    title: null,
     targetColor: null, // rgb
     colorDiff: null, // on each r/g/b component
     targetFaviconColor: null, // rgb
@@ -12,6 +13,7 @@ const parameterSettings = {
 
 // Persists the values, even when they are toggled off.
 const inputValues = {
+    title: '',
     targetColor: [0, 0, 0],
     colorDiff: 127,
     oldestCreateTime: null,
@@ -21,6 +23,7 @@ const inputValues = {
 };
 
 const checkboxes = {
+    title: document.getElementById("titleCheckbox"),
     oldestCreateTime: document.getElementById("createdAfterCheckbox"),
     newestCreateTime: document.getElementById("createdBeforeCheckbox"),
     oldestModifyTime: document.getElementById("modifiedAfterCheckbox"),
@@ -28,6 +31,7 @@ const checkboxes = {
     targetColor: document.getElementById("colorCheckbox")
 };
 
+checkboxes.title.addEventListener('change', () => toggleParameter("title"));
 checkboxes.oldestCreateTime.addEventListener('change', () => toggleParameter("oldestCreateTime"));
 checkboxes.newestCreateTime.addEventListener('change', () => toggleParameter("newestCreateTime"));
 checkboxes.oldestModifyTime.addEventListener('change', () => toggleParameter("oldestModifyTime"));
@@ -36,6 +40,7 @@ checkboxes.targetColor.addEventListener('change', () => toggleParameter("targetC
 // checkboxes.targetColor.addEventListener('change', () => toggleParameter("colorDiff"));
 
 // Data and time inputs
+const titleInput = document.getElementById("titleTextbox");
 const oldestCreateDayInput = document.getElementById("createdAfterDate");
 const oldestCreateTimeInput = document.getElementById("createdAfterTime");
 const newestCreateDayInput = document.getElementById("createdBeforeDate");
@@ -44,6 +49,15 @@ const oldestModifyDayInput = document.getElementById("modifiedAfterDate");
 const oldestModifyTimeInput = document.getElementById("modifiedAfterTime");
 const newestModifyDayInput = document.getElementById("modifiedBeforeDate");
 const newestModifyTimeInput = document.getElementById("modifiedBeforeTime");
+
+titleInput.addEventListener('change', event => {
+    let value = event.target.value;
+    if (value)
+        inputValues.title = value;
+    if (checkboxes.title.checked)
+        parameterSettings.title = inputValues.title;
+    console.log(JSON.parse(JSON.stringify(parameterSettings)));
+});
 
 oldestCreateDayInput.addEventListener('change', event => setDate(event, "oldestCreateTime"));
 oldestCreateTimeInput.addEventListener('change', event => setHours(event, "oldestCreateTime"));
