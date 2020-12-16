@@ -88,11 +88,12 @@ function insertIframe(data, doc, children, restoring) {
     let btnContainer = doc.createElement("div");
     btnContainer.classList.add("btnContainer");
 
-    let element = $(`.userClicked${windowId}`)[0];
+    let elements = doc.getElementsByClassName(`userClicked${windowId}`);
+    let element = elements[0];
 
     // Create the minimized button
     // delete any existing minized button, in case this link was opened and then closed and now opened again
-    for (let i = 0; i < element.parentNode.childNodes.length; i++) {
+    for (let i = 0; i < element.parentNode.childNodes.length; ++i) {
         if (element.parentNode.childNodes[i].id.startsWith('minimized'))
             element.parentNode.childNodes[i].remove();
     }
@@ -112,7 +113,7 @@ function insertIframe(data, doc, children, restoring) {
 
     // Create the closed button
     // delete any existing closed button
-    for (let i = 0; i < element.parentNode.childNodes.length; i++) {
+    for (let i = 0; i < element.parentNode.childNodes.length; ++i) {
         if (element.parentNode.childNodes[i].id.startsWith('closed'))
             element.parentNode.childNodes[i].remove();
     }
