@@ -46,7 +46,7 @@
   "browser_action": {
     "default_icon": "icons/icon-32.png",
     "default_title": "Context Browser",
-    "default_popup": "context_graph.html"
+    "default_popup": "save.html"
   },
 
   "sidebar_action": {

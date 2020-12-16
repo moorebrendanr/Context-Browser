@@ -171,7 +171,7 @@ function search() {
 function populateResults(saves) {
     const resultsDiv = document.getElementById("searchResults");
     $(resultsDiv).empty();
-    // TODO: This code is duplicated from context_graph.js, but I don't know a better solution in
+    // TODO: This code is duplicated from save.js, but I don't know a better solution in
     //       JavaScript at the moment. Should abstract this logic somehow.
     for (const save of saves) {
         let saveId = save.id;
