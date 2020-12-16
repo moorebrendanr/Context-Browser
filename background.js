@@ -4,6 +4,7 @@ browser.runtime.onMessage.addListener(onReceived);
 
 let enabled = true;
 let windowId = 0;
+let restoreQueue = {};
 
 async function initLocalStorage() {
     await browser.storage.local.get('enabled').then(data => {
@@ -237,14 +238,19 @@ async function restoreSave(id) {
         'url': save.url
     }).then(tab => {
         trees[tab.id] = save.tree;
-        setTimeout(() => {
-            browser.tabs.sendMessage(tab.id, {
-                'id': 'restore',
-                'tree': save.tree
-            });
-        }, 4000);
+        restoreQueue[tab.id] = save.tree;
     });
 }
+
+browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+    if (tabId in restoreQueue && changeInfo.status === 'complete') {
+        browser.tabs.sendMessage(tabId, {
+            id: 'restore',
+            tree: restoreQueue[tab.id]
+        });
+        delete restoreQueue[tab.id];
+    };
+});
 
 async function search(params) {
     let targetColor = params.color;
