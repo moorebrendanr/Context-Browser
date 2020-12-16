@@ -78,6 +78,11 @@ function insertIframe(data, doc, children, restoring, nodeNum) {
     iframe.src = url;
     iframe.classList.add("linkPreviewIframe");
     iframe.onload = () => {
+        browser.runtime.sendMessage({
+            id: 'setTitle',
+            windowId: windowId,
+            title: iframe.contentDocument.title
+        });
         if (!restoring || children == null)
             return;
         for (let i = 0; i < children.length; ++i) {

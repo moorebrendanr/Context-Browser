@@ -96,6 +96,9 @@ function onReceived(message, sender, sendResponse) {
         case 'setFaviconColor':
             setFaviconColor(message.windowId, message.color);
             break;
+        case 'setTitle':
+            setTitle(message.windowId, message.title);
+            break;
         case 'saveCurrentTab':
             browser.tabs.query({currentWindow: true, active: true}).then((tabs) => {
                 addSave(tabs[0]).then(() => {
@@ -191,11 +194,23 @@ function deleteIframe(tabId, windowId) {
 }
 
 function setFaviconColor(windowId, color) {
-    console.log(`Setting window ${windowId} to ${color}`);
+    console.log(`Setting window ${windowId} favicon color to ${color}`);
     for (const tabId in trees) {
         trees[tabId].traverseDown(item => {
             if (item.data.id === windowId) {
                 item.data.faviconColor = color;
+                return false;
+            }
+        });
+    }
+}
+
+function setTitle(windowId, title) {
+    console.log(`Setting window ${windowId} title to ${title}`);
+    for (const tabId in trees) {
+        trees[tabId].traverseDown(item => {
+            if (item.data.id === windowId) {
+                item.data.title = title;
                 return false;
             }
         });
@@ -421,6 +436,8 @@ browser.webNavigation.onCompleted.addListener(details => {
                     trees[details.tabId].data.faviconColor = avgColor);
                 getAvgColor(imageUri).then(avgColor =>
                     trees[details.tabId].data.pageColor = avgColor);
+                browser.tabs.get(details.tabId).then(tab =>
+                    trees[details.tabId].data.title = tab.title);
             }, onError);
     } else {
         console.log(`Searching for url ${details.url}...`);
