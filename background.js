@@ -301,13 +301,16 @@ async function search(params) {
             return false;
         let data = node.data;
         if (targetColor != null && colorDiff != null) {
+            let targetR = targetColor[0];
+            let targetG = targetColor[1];
+            let targetB = targetColor[2];
             let pageColor = data.pageColor;
-            let pageRmin = targetColor.r - colorDiff;
-            let pageGmin = targetColor.g - colorDiff;
-            let pageBmin = targetColor.b - colorDiff;
-            let pageRmax = targetColor.r + colorDiff;
-            let pageGmax = targetColor.g + colorDiff;
-            let pageBmax = targetColor.b + colorDiff;
+            let pageRmin = targetR - colorDiff;
+            let pageGmin = targetG - colorDiff;
+            let pageBmin = targetB - colorDiff;
+            let pageRmax = targetR + colorDiff;
+            let pageGmax = targetG + colorDiff;
+            let pageBmax = targetB + colorDiff;
             if (pageColor.r < pageRmin || pageColor.r > pageRmax)
                 return false;
             if (pageColor.g < pageGmin || pageColor.g > pageGmax)
