@@ -52,7 +52,11 @@ async function getSavedContexts() {
         p.appendChild(document.createTextNode(save.url));
         p.appendChild(document.createElement('br'));
         p.appendChild(document.createElement('br'));
-        p.appendChild(document.createTextNode(`Saved ${dateToString(save.date)}`));
+        p.appendChild(document.createTextNode(`Saved ${dateToString(save.saveDate)}`));
+        p.appendChild(document.createElement('br'));
+        p.appendChild(document.createTextNode(`Created ${dateToString(save.createdDate)}`));
+        p.appendChild(document.createElement('br'));
+        p.appendChild(document.createTextNode(`Modified ${dateToString(save.updateDate)}`));
         p.appendChild(document.createElement('br'));
         if (save.numNodes == 1)
             p.appendChild(document.createTextNode('1 page'));

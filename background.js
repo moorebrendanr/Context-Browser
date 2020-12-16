@@ -221,7 +221,15 @@ async function addSave(tab) {
     let tree = trees[tab.id];
 
     let numNodes = 0;
-    tree.traverseDown((node) => { ++numNodes; });
+    let createdDate = new Date();
+    let updateDate = new Date();
+    tree.traverseDown((node) => {
+        ++numNodes;
+        if (node.data.date < createdDate)
+            createdDate = node.data.date;
+        if (node.data.date > updateDate)
+            updateDate = node.data.date;
+    });
 
     let screenshot = await browser.tabs.captureVisibleTab();
 
@@ -231,9 +239,11 @@ async function addSave(tab) {
         'title': tab.title,
         'faviconUrl': tab.favIconUrl,
         'tree': tree,
-        'date': new Date(),
         'numNodes': numNodes,
-        'screenshot': screenshot
+        'screenshot': screenshot,
+        'saveDate': new Date(),
+        'createdDate': createdDate,
+        'updateDate': updateDate
     };
 
     let data = await browser.storage.local.get('saves');
