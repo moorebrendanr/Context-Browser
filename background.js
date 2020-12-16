@@ -374,5 +374,7 @@ browser.webNavigation.onCompleted.addListener(details => {
 });
 
 browser.webNavigation.onCommitted.addListener(details => {
+    if (details.transitionType != 'reload')
+        return;
     delete trees[details.tabId];
 });
