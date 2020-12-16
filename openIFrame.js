@@ -19,7 +19,7 @@ function onReceived(message, sender, sendResponse) {
         for (let i = 0; i < childNodes.length; i++) {
             let childNode = childNodes[i];
             console.log(`restoring iframe for ${childNode.data.openingData.targetUrl}`)
-            insertIframe(childNode.data.openingData, document, childNode.children, true);
+            insertIframe(childNode.data.openingData, document, childNode.children, true, i);
         };
     }
 }
@@ -27,7 +27,7 @@ function onReceived(message, sender, sendResponse) {
 /**
  * Create a PiP view associated with a certain link element on the page.
  */
-function insertIframe(data, doc, children, restoring) {
+function insertIframe(data, doc, children, restoring, nodeNum) {
     let url = data.targetUrl;
     let upThumbnail = data.upThumbnail;
     let windowId = data.windowId;
@@ -39,6 +39,15 @@ function insertIframe(data, doc, children, restoring) {
     let div = doc.createElement("div");
     div.id = containerId;
     div.classList.add("linkPreviewContainer");
+    // initial positioning when restoring windows
+    console.log('nodenum ' + nodeNum);
+    let divPosX = (nodeNum % 2 === 0) ? 5 : 55;
+    divPosX += Math.floor(nodeNum/4) * 5;
+    // TODO: y algorighm only works for up to 4 child windows within one parent
+    let divPosY = (nodeNum == 0 || nodeNum == 1) ? 5 : 55;
+    divPosY += Math.floor(nodeNum/4) *5;
+    div.style.left = divPosX + "%";
+    div.style.top = divPosY + "%";
     div.onclick = function() {
         // Bring selected element to front
         $(".linkPreviewContainer").each(function(index, element) {
@@ -71,12 +80,13 @@ function insertIframe(data, doc, children, restoring) {
     iframe.onload = () => {
         if (!restoring || children == null)
             return;
-        for (let i = 0; i < children.length; i++) {
+        for (let i = 0; i < children.length; ++i) {
             let childNode = children[i];
             insertIframe(childNode.data.openingData,
                 iframe.contentDocument,
                 childNode.children,
-                true);
+                true,
+                i);
         }
     };
 
@@ -240,7 +250,7 @@ function handleLinkClick(el) {
         'linkText': el.textContent
     }).then(r => {
         el.classList.add("userClicked" + r.windowId);
-        insertIframe(r, document, null, false);
+        insertIframe(r, document, null, false, 0);
     });
 }
 
