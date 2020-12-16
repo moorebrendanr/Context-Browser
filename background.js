@@ -195,7 +195,7 @@ function setFaviconColor(windowId, color) {
     for (const tabId in trees) {
         trees[tabId].traverseDown(item => {
             if (item.data.id === windowId) {
-                item.data.color = color;
+                item.data.faviconColor = color;
                 return false;
             }
         });
@@ -359,6 +359,8 @@ browser.webNavigation.onCompleted.addListener(details => {
             .then(imageUri => {
                 console.log(`Setting data for tab ${details.tabId} with url ${details.url} and image ${imageUri}`);
                 initializeTree(details.tabId, details.url, imageUri);
+                getAvgColor(imageUri).then(avgColor =>
+                    trees[details.tabId].data.pageColor = avgColor);
             }, onError);
     } else {
         console.log(`Searching for url ${details.url}...`);
@@ -379,6 +381,8 @@ browser.webNavigation.onCompleted.addListener(details => {
                     const node = trees[details.tabId].find(node =>
                         node.data.url === details.url);
                     node.data.imageUri = imageUri;
+                    getAvgColor(imageUri).then(avgColor =>
+                        node.data.pageColor = avgColor);
                 }, onError);
                 break;
             }
