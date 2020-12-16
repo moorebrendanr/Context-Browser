@@ -94,7 +94,8 @@ function insertIframe(data, doc, children, restoring) {
     // Create the minimized button
     // delete any existing minized button, in case this link was opened and then closed and now opened again
     for (let i = 0; i < element.parentNode.childNodes.length; ++i) {
-        if (element.parentNode.childNodes[i].id.startsWith('minimized'))
+        if (element.parentNode.childNodes[i].id
+            && element.parentNode.childNodes[i].id.startsWith('minimized'))
             element.parentNode.childNodes[i].remove();
     }
     let minimized = doc.createElement("button");
@@ -114,7 +115,8 @@ function insertIframe(data, doc, children, restoring) {
     // Create the closed button
     // delete any existing closed button
     for (let i = 0; i < element.parentNode.childNodes.length; ++i) {
-        if (element.parentNode.childNodes[i].id.startsWith('closed'))
+        if (element.parentNode.childNodes[i].id
+            && element.parentNode.childNodes[i].id.startsWith('closed'))
             element.parentNode.childNodes[i].remove();
     }
     let closed = doc.createElement("button");
