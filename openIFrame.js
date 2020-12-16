@@ -17,7 +17,7 @@ function onReceived(message, sender, sendResponse) {
 /**
  * Create a PiP view associated with a certain link element on the page.
  */
-function createIframe(data) {
+function insertIframe(data, doc) {
     let url = data.targetUrl;
     let upThumbnail = data.upThumbnail;
     let windowId = data.windowId;
@@ -26,7 +26,7 @@ function createIframe(data) {
     let containerId = "linkPreviewContainer" + windowId;
 
     // Create the containing div
-    let div = document.createElement("div");
+    let div = doc.createElement("div");
     div.id = containerId;
     div.classList.add("linkPreviewContainer");
     div.onclick = function() {
@@ -50,21 +50,24 @@ function createIframe(data) {
     });
 
     // create the iframe
-    let iframe = document.createElement("iframe");
+    let iframe = doc.createElement("iframe");
     iframe.ctxBrowserId = windowId;
     iframe.src = url;
     iframe.classList.add("linkPreviewIframe");
+    iframe.onload = () => {
+        console.log(iframe.contentDocument);
+    };
 
     // create the header bar
-    let headerBar = document.createElement("div");
+    let headerBar = doc.createElement("div");
     headerBar.classList.add("headerBar");
 
     // create the button container
-    let btnContainer = document.createElement("div");
+    let btnContainer = doc.createElement("div");
     btnContainer.classList.add("btnContainer");
 
     // Create the minimized button
-    let minimized = document.createElement("button");
+    let minimized = doc.createElement("button");
     let minimizedId = "minimized" + windowId;
     minimized.id = minimizedId;
     minimized.type = "button";
@@ -79,7 +82,7 @@ function createIframe(data) {
     insertAfter(minimized, element);
 
     // create the close button
-    let btnClose = document.createElement("button");
+    let btnClose = doc.createElement("button");
     btnClose.type = "button";
     btnClose.classList.add("btnClose", "windowButton");
     btnClose.onclick = function () {
@@ -92,7 +95,7 @@ function createIframe(data) {
     };
 
     // create the minimize button
-    let btnMin = document.createElement("button");
+    let btnMin = doc.createElement("button");
     btnMin.type = "button";
     btnMin.classList.add("btnMin", "windowButton");
     btnMin.onclick = function () {
@@ -102,7 +105,7 @@ function createIframe(data) {
     };
 
     // create the maximize button
-    let btnMax = document.createElement("button");
+    let btnMax = doc.createElement("button");
     btnMax.type = "button";
     btnMax.classList.add("btnMax", "windowButton");
     btnMax.onclick = function () {
@@ -133,12 +136,12 @@ function createIframe(data) {
     div.appendChild(iframe);
     if (upThumbnail) {
         console.log("Setting up thumbnail");
-        let thumbnailImg = document.createElement("img");
+        let thumbnailImg = doc.createElement("img");
         thumbnailImg.classList.add("upThumbnail");
         thumbnailImg.src = upThumbnail;
         div.appendChild(thumbnailImg);
     }
-    document.body.appendChild(div);
+    doc.body.appendChild(div);
 
     // Add the ids to the map
     let pair = {containerId: containerId, minimizedId: minimizedId};
@@ -181,7 +184,7 @@ function handleLinkClick(el) {
         'linkText': el.textContent
     }).then(r => {
         el.classList.add("userClicked" + r.windowId);
-        createIframe(r);
+        insertIframe(r, document);
     });
 }
 
