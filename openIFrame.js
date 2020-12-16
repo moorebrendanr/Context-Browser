@@ -197,12 +197,15 @@ function insertIframe(data, doc, children, restoring) {
     doc.body.appendChild(div);
 
     // Add the ids to the map
-    let pair = {containerId: containerId, minimizedId: minimizedId};
-    iframes.set(url, pair);
+    if (!restoring) {
+        let pair = {containerId: containerId, minimizedId: minimizedId};
+        iframes.set(url, pair);
+    }
 
-    dragElement(div);
-    setResizable(div);
-    notifyIframeCreated(url, iframe.getBoundingClientRect())
+    dragElement(doc, div);
+    setResizable(doc, div);
+    if (!restoring)
+        notifyIframeCreated(url, iframe.getBoundingClientRect())
 }
 
 function notifyIframeCreated(url, boundingBox) {
@@ -241,7 +244,7 @@ function handleLinkClick(el) {
     });
 }
 
-function setResizable(el) {
+function setResizable(doc, el) {
     console.log("set resizable");
     // https://stackoverflow.com/a/22720042
     $(el).resizable({
@@ -272,7 +275,7 @@ function setResizable(el) {
 }
 
 // https://www.w3schools.com/howto/howto_js_draggable.asp
-function dragElement(elmnt) {
+function dragElement(document, elmnt) {
     let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
     elmnt.firstChild.onmousedown = dragMouseDown;
     let iframeBarrier;
