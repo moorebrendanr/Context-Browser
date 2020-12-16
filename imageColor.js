@@ -1,3 +1,7 @@
+function getFaviconURL(domainURL) {
+    return "https://s2.googleusercontent.com/s2/favicons?domain_url=" + domainURL;
+}
+
 function getAvgColor(imageUrl) {
     return new Promise((resolve) => {
         let canvas = document.createElement("canvas");

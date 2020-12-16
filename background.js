@@ -359,6 +359,8 @@ browser.webNavigation.onCompleted.addListener(details => {
             .then(imageUri => {
                 console.log(`Setting data for tab ${details.tabId} with url ${details.url} and image ${imageUri}`);
                 initializeTree(details.tabId, details.url, imageUri);
+                getAvgColor(getFaviconURL(details.url)).then(avgColor =>
+                    trees[details.tabId].data.faviconColor = avgColor);
                 getAvgColor(imageUri).then(avgColor =>
                     trees[details.tabId].data.pageColor = avgColor);
             }, onError);

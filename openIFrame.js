@@ -325,7 +325,3 @@ function dragElement(elmnt) {
 function insertAfter(newNode, referenceNode) {
     referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
 }
-
-function getFaviconURL(domainURL) {
-    return "https://s2.googleusercontent.com/s2/favicons?domain_url=" + domainURL;
-}
